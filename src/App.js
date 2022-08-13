@@ -1,24 +1,43 @@
-import logo from './logo.svg';
 import './App.css';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import ProvideAuth from './components/auth/ProvideAuth';
+import Home from './pages/Home';
+import PrivateRoute from './components/auth/PrivateRoute';
+import Login from './pages/Login';
+import Logout from './pages/Logout';
+import Dashboard from './pages/Dashboard';
+import Navigation from './components/common/Navigation';
+import Groups from './pages/account/groups/Groups';
+import Cameras from './pages/account/cameras/Cameras';
+import CreateGroup from './pages/account/groups/CreateGroup';
+import AlertNotifications from './components/notifications/AlertNotifications';
+import Alerts from './components/notifications/Alerts';
+import CameraMutate from './pages/account/cameras/CameraMutate';
+import CameraConfiguration from './pages/account/cameras/CameraConfiguration';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ProvideAuth>
+      <Router>
+        <Navigation/>
+        <main>
+          <AlertNotifications>
+            <Alerts/>
+            <Routes>
+              <Route path="/" element={<PrivateRoute><Home/></PrivateRoute>}/>
+              <Route path="/dashboard" element={<PrivateRoute><Dashboard/></PrivateRoute>}/>
+              <Route path="/account/cameras" element={<PrivateRoute><Cameras/></PrivateRoute>}/>
+              <Route path="/account/cameras/:cameraId" element={<PrivateRoute><CameraMutate/></PrivateRoute>}/>
+              <Route path="/account/cameras/:cameraId/configuration" element={<PrivateRoute><CameraConfiguration/></PrivateRoute>}/>
+              <Route path="/account/groups" element={<PrivateRoute><Groups/></PrivateRoute>}/>
+              <Route path="/account/groups/:groupId" element={<PrivateRoute><CreateGroup/></PrivateRoute>}/>
+              <Route path="/login" element={<Login/>}/>
+              <Route path="/logout" element={<Logout/>}/>
+            </Routes>
+          </AlertNotifications>
+        </main>
+      </Router>
+    </ProvideAuth>
   );
 }
 
