@@ -1,7 +1,7 @@
 import BaseService from "./BaseService";
+import { settings } from "../constants";
 
-// TODO: make configurable
-const ENDPOINT = "https://ewpc8yfdyd.execute-api.us-east-1.amazonaws.com"
+const ENDPOINT = settings.serviceEndpoint;
 
 class Resource extends BaseService {
     constructor(endpoint, sessions, name) {

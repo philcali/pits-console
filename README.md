@@ -2,6 +2,20 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Configuration
+
+Not committed to this repository is a `settings.json` file in `src/lib` that
+will inform where the application should go for authentication, authorization,
+resource server, and redirect URI. An example one shown below:
+
+```
+{
+    "authEndpoint": "https://dev.auth.pinthesky.com",
+    "serviceEndpoint": "https://dev.api.pinthesky.com",
+    "clientId": "xxxxxxxxxxxx"
+}
+```
+
 ## Available Scripts
 
 In the project directory, you can run:

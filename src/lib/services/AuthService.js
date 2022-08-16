@@ -1,7 +1,8 @@
 import BaseService from "./BaseService";
+import { settings } from "../constants";
 
-const ENDPOINT = 'https://auth.pinthesky.com'
-const CLIENT_ID = '71djrmpj409or4lks1sr9jh2i1';
+const ENDPOINT = settings.authEndpoint;
+const CLIENT_ID = settings.clientId;
 
 class AuthService extends BaseService {
     constructor(sessions) {

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Col, Container, Row } from "react-bootstrap";
+import { Col, Container, Row, Spinner } from "react-bootstrap";
+import { Link } from "react-router-dom";
 import CameraCard from "../components/cameras/CameraCard";
 import Footer from "../components/common/Footer";
 import { pitsService } from "../lib/services";
@@ -88,13 +89,23 @@ function Dashboard() {
         }
     });
 
+    const isEmpty = !groups.loading && groups.items.length === 0;
+
     return (
         <Container>
-            {groups.items.map(group => {
+            {groups.loading && <Spinner className="mt-3" animation="border"/>}
+            {!(groups.loading) && groups.items.map(group => {
                 let cameras = camerasToGroup.groups[group.name];
+                let camerasIsEmpty = (cameras && !cameras.loading && cameras.items.length === 0);
                 return (
                     <div key={`cameras-${group.name}`}>
                         <h2 className="mt-3 pb-3 mb-3" style={{borderBottom: '1px solid #ddd'}}>{group.name} Cameras</h2>
+                        {camerasIsEmpty &&
+                        <p>
+                            Looks like there are no <Link to="/account/cameras">cameras</Link> associated to <Link to={`/account/groups/${group.name}`}>{group.name}</Link>.
+                        </p>
+                        }
+                        {!camerasIsEmpty &&
                         <Row xs={1} md={3}>
                             {(cameras || { items: [] }).items.map(camera => {
                                 return (
@@ -104,9 +115,19 @@ function Dashboard() {
                                 );
                             })}
                         </Row>
+                        }
                     </div>
                 );
             })}
+            {isEmpty &&
+                <div>
+                    <h2 class="mt-3 pb-3 mb-3" style={{ borderBottom: '1px solid #ddd' }}>No Groups</h2>
+                    <p>
+                        It looks like you do not have any groups.
+                        Head over to <Link to="/account/groups">Groups</Link> to create and manage groups.
+                    </p>
+                </div>
+            }
             <Footer/>
         </Container>
     );
