@@ -100,21 +100,27 @@ function ResourceList(props) {
             ...modal,
             submitting: true
         });
-        pitsService[props.resource]().delete(modal.item[props.resourceId])
-            .then(resp => {
-                if (resp) {
-                    alerts.success(`Successfully deleted ${modal.item[props.resourceId]}.`);
-                    setContent({
-                        ...content,
-                        items: [],
-                        nextToken: null,
-                        loading: true
-                    });
-                } else {
-                    alerts.error(`Failed to delete ${modal.item[props.resourceId]}.`);
-                }
-            })
-            .finally(handleModalClose);
+        let handleDelete = props.handleDelete;
+        if (typeof handleDelete === 'undefined') {
+            handleDelete = (item, onSuccess, onComplete) => {
+                pitsService[props.resource]().delete(item[props.resourceId])
+                    .then(onSuccess)
+                    .finally(onComplete);
+            };
+        }
+        handleDelete(modal.item, resp => {
+            if (resp) {
+                alerts.success(`Successfully deleted ${modal.item[props.resourceId]}.`);
+                setContent({
+                    ...content,
+                    items: [],
+                    nextToken: null,
+                    loading: true
+                });
+            } else {
+                alerts.error(`Failed to delete ${modal.item[props.resourceId]}.`);
+            }
+        }, handleModalClose);
     };
 
     return (
@@ -161,11 +167,12 @@ function ResourceList(props) {
                     </thead>
                     <tbody>
                         {content.items.filter(item => item[props.resourceId].match(search.text)).map((item, index) => {
+                            let editLink = props.formatEdit ? props.formatEdit(item) : `/account/${props.resource}/${item[props.resourceId]}`;
                             return (
                                 <tr key={`item-${index}`}>
                                     {columns.map(column => <td key={`item-${index}-${column.label}`}>{column.format(item)}</td>)}
                                     <td>
-                                        <Button size="sm" className="me-1" as={Link} to={`/account/${props.resource}/${item[props.resourceId]}`} variant="secondary">{icons.icon('pencil')}</Button>
+                                        <Button size="sm" className="me-1" as={Link} to={editLink} variant="secondary">{icons.icon('pencil')}</Button>
                                         {(props.actions || []).map(action => <Button size="sm" className="me-1" variant="secondary" onClick={action.onClick(item)} key={`item-${index}-${action.icon}`}>{icons.icon(action.icon)}</Button>)}
                                         <Button size="sm" onClick={handleDeleteModal(item)} variant="danger">{icons.icon('trash')}</Button>
                                     </td>

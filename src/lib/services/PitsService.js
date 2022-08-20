@@ -175,6 +175,11 @@ class PitsService extends BaseService {
         return this.request(`/cameras/${thingName}/captureImage/url`)
             .then(resp => resp.json());
     }
+
+    async getVideoUrl(thingName, motionVideo) {
+        return this.request(`/videos/${motionVideo}/cameras/${thingName}/url`)
+            .then(resp => resp.json());
+    }
 }
 
 ['cameras', 'groups', 'videos'].forEach(resource => {
