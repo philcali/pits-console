@@ -177,7 +177,7 @@ class PitsService extends BaseService {
     }
 }
 
-['cameras', 'groups'].forEach(resource => {
+['cameras', 'groups', 'videos'].forEach(resource => {
     PitsService.prototype[resource] = function name() {
         return this.resource(resource);
     };

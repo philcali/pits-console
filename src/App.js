@@ -14,6 +14,7 @@ import AlertNotifications from './components/notifications/AlertNotifications';
 import Alerts from './components/notifications/Alerts';
 import CameraMutate from './pages/account/cameras/CameraMutate';
 import CameraConfiguration from './pages/account/cameras/CameraConfiguration';
+import Videos from './pages/account/videos/Videos';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
               <Route path="/account/cameras/:cameraId/configuration" element={<PrivateRoute><CameraConfiguration/></PrivateRoute>}/>
               <Route path="/account/groups" element={<PrivateRoute><Groups/></PrivateRoute>}/>
               <Route path="/account/groups/:groupId" element={<PrivateRoute><CreateGroup/></PrivateRoute>}/>
+              <Route path="/account/videos" element={<PrivateRoute><Videos/></PrivateRoute>}/>
               <Route path="/login" element={<Login/>}/>
               <Route path="/logout" element={<Logout/>}/>
             </Routes>

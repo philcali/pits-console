@@ -22,7 +22,7 @@ function Navigation() {
     return (
         <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark" sticky="top">
             <Container fluid>
-                <Navbar.Brand href="/">
+                <Navbar.Brand as={Link} to="/">
                     <img
                         src={logo}
                         width="40"
@@ -41,6 +41,7 @@ function Navigation() {
                             <NavDropdown active={location.pathname.match(/^\/account/)} title={accountTitle}>
                                 <NavDropdown.Item {...setHrefAndActive('/account/groups')}>Groups</NavDropdown.Item>
                                 <NavDropdown.Item {...setHrefAndActive('/account/cameras')}>Cameras</NavDropdown.Item>
+                                <NavDropdown.Item {...setHrefAndActive('/account/videos')}>Motion Videos</NavDropdown.Item>
                             </NavDropdown>
                             <Nav.Link href={authService.logoutEndpoint(window.location.origin)}>{icons.icon('box-arrow-right')} <small>Log Out</small></Nav.Link>
                         </Nav>

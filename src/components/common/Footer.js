@@ -1,3 +1,4 @@
+import settings from '../../lib/settings.json';
 
 function Footer() {
     return (
@@ -6,7 +7,7 @@ function Footer() {
             <footer className="container">
                 <p>
                     <span dangerouslySetInnerHTML={{ "__html": "&copy" }}/>{' '}
-                    Calico. {new Date().getFullYear()}
+                    {settings.companyName || 'Calico.'} {new Date().getFullYear()}
                 </p>
             </footer>
         </>

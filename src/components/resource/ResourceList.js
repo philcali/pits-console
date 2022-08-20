@@ -18,6 +18,7 @@ import { useAlerts } from "../notifications/AlertContext";
 
 function ResourceList(props) {
     const alerts = useAlerts();
+    const canCreate = props.create === true || typeof(props.create) === 'undefined';
     let [ content, setContent ] = useState({
         items: [],
         nextToken: null,
@@ -66,12 +67,12 @@ function ResourceList(props) {
     ];
 
     const isEmpty = content.items.length === 0;
-    let footerLabel;
+    let footerLabel = '';
     if (content.loading) {
         footerLabel = <Spinner animation="border"/>;
     } else if (isEmpty) {
         footerLabel = `No ${props.resource} found.`;
-    } else {
+    } else if (canCreate) {
         footerLabel = <Button as={Link} to={`/account/${props.resource}/new`} variant="success">{icons.icon('plus')} New {props.resourceTitle}</Button>
     }
 
@@ -143,9 +144,11 @@ function ResourceList(props) {
                                 placeholder="Search"
                             />
                         </InputGroup>
+                        {canCreate &&
                         <ButtonGroup>
                             <Button as={Link} to={`/account/${props.resource}/new`} variant="success">{icons.icon('plus')} Create</Button>
                         </ButtonGroup>
+                        }
                     </ButtonToolbar>
                 </div>
 
