@@ -17,6 +17,9 @@ function CameraConfiguration() {
     const alerts = useAlerts();
     const navigate = useNavigate();
     const { cameraId } = useParams();
+    const [ cameraData, setCameraData ] = useState({
+        loading: true
+    });
     const [ formData, setFormData ] = useState({
         buffer: '',
         sensitivity: '',
@@ -62,6 +65,22 @@ function CameraConfiguration() {
                         })
                     }
                 });
+        }
+        if (cameraData.loading) {
+            pitsService.cameras().get(cameraId).then(resp => {
+                if (isMounted) {
+                    setCameraData({
+                        ...resp,
+                        loading: false
+                    });
+                }
+            })
+            .catch(e => {
+                alerts.error(`Failed to load ${cameraId}.`);
+                setCameraData({
+                    loading: false,
+                })
+            })
         }
         return () => {
             isMounted = false;
@@ -124,12 +143,12 @@ function CameraConfiguration() {
         <>
             <Container>
                 <h2 className="pt-3 pb-2 mb-3" style={{ borderBottom: '1px solid #ddd' }}>
-                    Configuring {cameraId}
+                    Configuring {cameraData.displayName || cameraId}
                 </h2>
                 <Form noValidate validated={data.validated} onSubmit={handleSubmit}>
                     <Row>
                         <Col className="text-center">
-                            <CameraCard thingName={cameraId}/>
+                            <CameraCard displayName={cameraData.displayName} thingName={cameraId}/>
                         </Col>
                         <Col>
                             <Row className="mb-3">

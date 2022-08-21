@@ -14,12 +14,12 @@ function Cameras() {
 
     const columns = [
         {
-            label: 'Thing',
-            format: (item) => item.thingName
-        },
-        {
             label: 'Display Name',
             format: (item) => item.displayName
+        },
+        {
+            label: 'Thing',
+            format: (item) => item.thingName
         }
     ];
 

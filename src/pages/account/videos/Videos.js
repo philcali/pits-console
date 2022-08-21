@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import MotionVideo from "../../../components/cameras/MotionVideo";
 import { icons } from "../../../components/common/Icons";
 import ResourceList from "../../../components/resource/ResourceList";
+import { formatDate, formatDuration, formatTime } from "../../../lib/format";
 import { pitsService } from "../../../lib/services";
 
 function Videos() {
@@ -14,15 +15,15 @@ function Videos() {
 
     const columns = [
         {
-            label: "Video",
-            format: (item) => item.motionVideo
-        },
-        {
             label: 'Camera',
             format: (item) => {
                 return <Link to={`/account/cameras/${item.thingName}/configuration`}>{item.thingName}</Link>
             }
-        }
+        },
+        {
+            label: "Duration",
+            format: (item) => formatDuration(item.duration)
+        },
     ];
 
     const actions = [
@@ -79,6 +80,9 @@ function Videos() {
                 resourceId="motionVideo"
                 handleDelete={handleDelete}
                 formatEdit={editLink}
+                formatTimestamp={createTime => `${formatDate(createTime)} ${formatTime(createTime)}`}
+                pagination={10}
+                manuallyPage={true}
                 create={false}
                 columns={columns}
                 actions={actions}

@@ -11,16 +11,19 @@ import {
     Table
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { formatDate } from "../../lib/format";
 import { pitsService } from "../../lib/services";
 import Footer from "../common/Footer";
 import { icons } from "../common/Icons";
 import { useAlerts } from "../notifications/AlertContext";
+import ResourcePagination from "./ResourcePagination";
 
 function ResourceList(props) {
     const alerts = useAlerts();
     const canCreate = props.create === true || typeof(props.create) === 'undefined';
     let [ content, setContent ] = useState({
         items: [],
+        currentSlice: [0, props.pagination || 10],
         nextToken: null,
         loading: true
     });
@@ -38,13 +41,21 @@ function ResourceList(props) {
     useEffect(() => {
         let isMounted = true;
         if (content.loading) {
-            pitsService[props.resource]().list({ nextToken: content.nextToken }).then(resp => {
+            let params = { nextToken: content.nextToken };
+            if (props.pagination) {
+                params['limit'] = props.pagination;
+            }
+            pitsService[props.resource]().list(params).then(resp => {
                 if (isMounted) {
+                    let loading = resp.nextToken !== null;
+                    if (loading && props.manuallyPage === true) {
+                        loading = false;
+                    }
                     setContent({
                         ...content,
                         items: content.items.concat(resp.items),
                         nextToken: resp.nextToken,
-                        loading: resp.nextToken !== null
+                        loading
                     });
                 }
             });
@@ -58,11 +69,9 @@ function ResourceList(props) {
         ...props.columns,
         {
             label: 'Created At',
-            format: (item) => new Date(item.createTime * 1000)
-                .toLocaleDateString()
-                .split("/")
-                .map(n => n.length === 1 ? `0${n}` : n)
-                .join('/')
+            format: (item) => props.formatTimestamp
+                ? props.formatTimestamp(item.createTime)
+                : formatDate(item.createTime)
         }
     ];
 
@@ -73,8 +82,15 @@ function ResourceList(props) {
     } else if (isEmpty) {
         footerLabel = `No ${props.resource} found.`;
     } else if (canCreate) {
-        footerLabel = <Button as={Link} to={`/account/${props.resource}/new`} variant="success">{icons.icon('plus')} New {props.resourceTitle}</Button>
+        footerLabel = <Button as={Link} to={`/account/${props.resource}/new`} variant="success">{icons.icon('plus')} New {props.resourceTitle}</Button>;
     }
+
+    const handleLoadMore = event => {
+        setContent({
+            ...content,
+            loading: true,
+        })
+    };
 
     const handleModalClose = () => {
         setModal({
@@ -123,6 +139,8 @@ function ResourceList(props) {
         }, handleModalClose);
     };
 
+    const searchedItems = content.items.filter(item => item[props.resourceId].match(search.text));
+
     return (
         <>
             <Modal show={modal.visible} onHide={handleModalClose}>
@@ -158,6 +176,14 @@ function ResourceList(props) {
                     </ButtonToolbar>
                 </div>
 
+                <ResourcePagination
+                    total={searchedItems.length}
+                    perPage={props.pagination || 10}
+                    finished={!content.nextToken && !content.loading}
+                    onLoadMore={handleLoadMore}
+                    onSelectedSlice={(start, end) => setContent({...content, currentSlice: [start, end]})}
+                />
+
                 <Table responsive hover>
                     <thead>
                         <tr>
@@ -166,7 +192,7 @@ function ResourceList(props) {
                         </tr>
                     </thead>
                     <tbody>
-                        {content.items.filter(item => item[props.resourceId].match(search.text)).map((item, index) => {
+                        {searchedItems.slice(content.currentSlice[0], content.currentSlice[1]).map((item, index) => {
                             let editLink = props.formatEdit ? props.formatEdit(item) : `/account/${props.resource}/${item[props.resourceId]}`;
                             return (
                                 <tr key={`item-${index}`}>
@@ -182,7 +208,12 @@ function ResourceList(props) {
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td className="text-center" colSpan={columns.length + 1}>{footerLabel}</td>
+                            <td className="text-center" colSpan={columns.length + 1}>
+                                {footerLabel}
+                                {(!content.loading && content.nextToken) &&
+                                <Button onClick={handleLoadMore} variant="outline-secondary">{icons.icon('arrow-clockwise')} Load More</Button>
+                                }
+                            </td>
                         </tr>
                     </tfoot>
                 </Table>
