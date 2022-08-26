@@ -55,7 +55,7 @@ function Videos() {
         });
     }
 
-    const editLink = item => `/accounts/videos/${item.motionVideo}/cameras/${item.thingName}`;
+    const editLink = item => `/account/videos/${item.motionVideo}/cameras/${item.thingName}`;
 
     return (
         <>

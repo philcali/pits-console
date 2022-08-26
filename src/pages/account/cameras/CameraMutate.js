@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import CameraCard from "../../../components/cameras/CameraCard";
+import CancelButton from "../../../components/common/CancelButton";
 import Footer from "../../../components/common/Footer";
+import Header from "../../../components/common/Header";
 import { useAlerts } from "../../../components/notifications/AlertContext";
 import AssociateControl from "../../../components/resource/AssociateControl";
 import { pitsService } from "../../../lib/services";
@@ -152,10 +154,6 @@ function CameraMutate() {
         }
     };
 
-    const cancelAndReturn = event => {
-        navigate(-1);
-    };
-
     const inputOnChange = event => {
         setFormData({
             ...formData,
@@ -191,10 +189,9 @@ function CameraMutate() {
     return (
         <>
             <Container>
-                <h2 className="pt-3 pb-2 mb-3" style={{ borderBottom: '1px solid #ddd' }}>
+                <Header>
                     {create ? 'Create Camera' : `Update ${formData.thingName}`}
-                </h2>
-
+                </Header>
                 <Form noValidate validated={data.validated} onSubmit={handleSubmit}>
                     {create &&
                     <>
@@ -247,7 +244,7 @@ function CameraMutate() {
                         />
                     </>
                     }
-                    <Button className="me-1" disabled={data.submitting} onClick={cancelAndReturn} variant="outline-secondary">Cancel</Button>
+                    <CancelButton className="me-1" disabled={data.submitting}/>
                     <Button disabled={data.submitting || !formData.thingName} type="submit" variant="success">{create ? 'Create' : 'Update'}</Button>
                 </Form>
                 <Footer/>
