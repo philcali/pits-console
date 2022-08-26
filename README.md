@@ -1,5 +1,7 @@
 # Pi In The Sky - Console
 
+[![Node.js CI](https://github.com/philcali/pits-console/actions/workflows/node.js.yml/badge.svg)](https://github.com/philcali/pits-console/actions/workflows/node.js.yml)
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Configuration
