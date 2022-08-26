@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, Container, Form } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
+import CancelButton from "../../../components/common/CancelButton";
 import Footer from "../../../components/common/Footer";
 import { useAlerts } from "../../../components/notifications/AlertContext";
 import AssociateControl from "../../../components/resource/AssociateControl";
@@ -92,10 +93,6 @@ function CreateGroup() {
         }
     };
 
-    const cancelAndReturn = event => {
-        navigate(-1);
-    };
-
     const inputOnChange = event => {
         setFormData({
             ...formData,
@@ -133,7 +130,7 @@ function CreateGroup() {
                             associatedResourceId="thingName"
                         />
                     }
-                    <Button className="me-1" disabled={data.submitting} onClick={cancelAndReturn} variant="outline-secondary">Cancel</Button>
+                    <CancelButton className="me-1" disabled={data.submitting}/>
                     <Button disabled={data.submitting} type="submit" variant="success">{create ? 'Create' : 'Update'}</Button>
                 </Form>
                 <Footer/>

@@ -72,7 +72,9 @@ function CameraCard(props) {
     const variant = props.variant || 'light';
     return (
         <Card bg={variant} text={variant === 'light' ? 'dark' : 'white'}>
-            <Card.Header {...cardHeader}><strong>{props.displayName || props.thingName}</strong></Card.Header>
+            <Card.Header {...cardHeader}>
+                <strong className="ms-6">{props.displayName || props.thingName}</strong>
+            </Card.Header>
             {!image.loading &&
             <Card.Img className="fluid" variant="top" src={image.url}/>
             }

@@ -15,6 +15,7 @@ import Alerts from './components/notifications/Alerts';
 import CameraMutate from './pages/account/cameras/CameraMutate';
 import CameraConfiguration from './pages/account/cameras/CameraConfiguration';
 import Videos from './pages/account/videos/Videos';
+import VideoMutate from './pages/account/videos/VideoMutate';
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
               <Route path="/account/groups" element={<PrivateRoute><Groups/></PrivateRoute>}/>
               <Route path="/account/groups/:groupId" element={<PrivateRoute><CreateGroup/></PrivateRoute>}/>
               <Route path="/account/videos" element={<PrivateRoute><Videos/></PrivateRoute>}/>
+              <Route path="/account/videos/:motionVideo/cameras/:cameraId" element={<PrivateRoute><VideoMutate/></PrivateRoute>}/>
               <Route path="/login" element={<Login/>}/>
               <Route path="/logout" element={<Logout/>}/>
             </Routes>

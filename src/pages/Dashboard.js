@@ -17,6 +17,11 @@ function Dashboard() {
         loading: false
     });
 
+    let [ batchCameras, setBatchCameras ] = useState({
+        cameras: {},
+        loading: false
+    });
+
     useEffect(() => {
         let isMounted = true;
         if (groups.loading) {
@@ -81,8 +86,33 @@ function Dashboard() {
                         groups: newGroups,
                         loading
                     });
+                    if (!loading) {
+                        setBatchCameras({
+                            ...batchCameras,
+                            loading: true
+                        })
+                    }
                 }
             })
+        }
+        if (batchCameras.loading) {
+            let thingName = [];
+            for (let groupName in camerasToGroup.groups) {
+                camerasToGroup.groups[groupName].items
+                    .forEach(item => thingName.push(item.id));
+            }
+            pitsService.cameras().list({ 'thingName': thingName }).then(resp => {
+                if (isMounted) {
+                    let cameras = {};
+                    resp.items.forEach(item => {
+                        cameras[item.thingName] = item.displayName;
+                    })
+                    setBatchCameras({
+                        cameras,
+                        loading: false
+                    });
+                }
+            });
         }
         return () => {
             isMounted = false;
@@ -110,7 +140,7 @@ function Dashboard() {
                             {(cameras || { items: [] }).items.map(camera => {
                                 return (
                                     <Col key={`camera-${group.name}-${camera.id}`} className="text-center">
-                                        <CameraCard thingName={camera.id}/>
+                                        <CameraCard thingName={camera.id} displayName={batchCameras.cameras[camera.id]}/>
                                     </Col>
                                 );
                             })}

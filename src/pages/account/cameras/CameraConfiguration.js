@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import CameraCard from "../../../components/cameras/CameraCard";
+import CancelButton from "../../../components/common/CancelButton";
 import Footer from "../../../components/common/Footer";
+import Header from "../../../components/common/Header";
 import { useAlerts } from "../../../components/notifications/AlertContext";
 import { pitsService } from "../../../lib/services";
 
@@ -15,7 +17,6 @@ const LEVELS = [
 
 function CameraConfiguration() {
     const alerts = useAlerts();
-    const navigate = useNavigate();
     const { cameraId } = useParams();
     const [ cameraData, setCameraData ] = useState({
         loading: true
@@ -135,16 +136,12 @@ function CameraConfiguration() {
         });
     };
 
-    const cancelAndReturn = () => {
-        navigate(-1);
-    };
-
     return (
         <>
             <Container>
-                <h2 className="pt-3 pb-2 mb-3" style={{ borderBottom: '1px solid #ddd' }}>
+                <Header>
                     Configuring {cameraData.displayName || cameraId}
-                </h2>
+                </Header>
                 <Form noValidate validated={data.validated} onSubmit={handleSubmit}>
                     <Row>
                         <Col className="text-center">
@@ -221,7 +218,7 @@ function CameraConfiguration() {
                             </Row>
                             <Row>
                                 <Col className="text-center">
-                                    <Button className="me-2" disabled={data.submitting} onClick={cancelAndReturn} variant="outline-secondary">Cancel</Button>
+                                    <CancelButton className="me-2" disabled={data.submitting}/>
                                     <Button disabled={data.submitting || formData.loading} type="submit" variant="success">Update</Button>
                                 </Col>
                             </Row>

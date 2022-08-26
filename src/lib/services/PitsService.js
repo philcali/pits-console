@@ -23,7 +23,13 @@ class Resource extends BaseService {
             let query = [];
             for (let key in params) {
                 if (params[key]) {
-                    query.push(`${key}=${encodeURIComponent(params[key])}`);
+                    let values = params[key];
+                    if (!Array.isArray(values)) {
+                        values = [values];
+                    }
+                    values.forEach(value => {
+                        query.push(`${key}=${encodeURIComponent(value)}`);
+                    });
                 }
             }
             if (query.length > 0) {
