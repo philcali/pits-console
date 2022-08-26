@@ -1,6 +1,8 @@
 # Pi In The Sky - Console
 
 [![Node.js CI](https://github.com/philcali/pits-console/actions/workflows/node.js.yml/badge.svg)](https://github.com/philcali/pits-console/actions/workflows/node.js.yml)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/philcali/pits-console.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/philcali/pits-console/alerts/)
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/philcali/pits-console.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/philcali/pits-console/context:javascript)
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

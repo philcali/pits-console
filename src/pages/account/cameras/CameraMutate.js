@@ -250,7 +250,7 @@ function CameraMutate() {
                 <Footer/>
             </Container>
         </>
-    )
+    );
 }
 
 export default CameraMutate;
