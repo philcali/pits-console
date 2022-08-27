@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Button,
     ButtonGroup,
@@ -23,6 +23,7 @@ function ResourceList(props) {
     const canCreate = props.create === true || typeof(props.create) === 'undefined';
     let [ content, setContent ] = useState({
         items: [],
+        additionalParams: {},
         currentSlice: [0, props.pagination || 10],
         nextToken: null,
         loading: true
@@ -41,11 +42,23 @@ function ResourceList(props) {
     useEffect(() => {
         let isMounted = true;
         if (content.loading) {
-            let params = { nextToken: content.nextToken };
+            let params = { ...content.additionalParams, nextToken: content.nextToken };
             if (props.pagination) {
                 params['limit'] = props.pagination;
             }
-            pitsService[props.resource]().list(params).then(resp => {
+            let resource = pitsService[props.resource]();
+            (props.searchParams || []).forEach(param => {
+                if (param.name in params) {
+                    if ('resource' in param) {
+                        resource = param.resource(resource, params[param.name]);
+                        delete params[param.name];
+                    } else if (param.type === 'date') {
+                        let date = new Date(params[param.name]);
+                        params[param.name] = date.toISOString();
+                    }
+                }
+            });
+            resource.list(params).then(resp => {
                 if (isMounted) {
                     let loading = resp.nextToken !== null;
                     if (loading && props.manuallyPage === true) {
@@ -139,6 +152,22 @@ function ResourceList(props) {
         }, handleModalClose);
     };
 
+    const handleSearchOnChange = event => {
+        let newParams = { ...content.additionalParams };
+        if (event.currentTarget.value === '') {
+            delete newParams[event.currentTarget.name];
+        } else {
+            newParams[event.currentTarget.name] = event.currentTarget.value;
+        }
+        setContent({
+            ...content,
+            items: [],
+            nextToken: null,
+            additionalParams: newParams,
+            loading: true
+        })
+    };
+
     const searchedItems = content.items.filter(item => item[props.resourceId].match(search.text));
 
     return (
@@ -167,6 +196,21 @@ function ResourceList(props) {
                                 onChange={(event) => setSearch({text: event.currentTarget.value})}
                                 placeholder="Search"
                             />
+                            {props.searchParams &&
+                                <>
+                                    {props.searchParams.map(param => {
+                                        return (
+                                            <React.Fragment key={`param-${param.name}`}>
+                                                <InputGroup.Text>{param.label}</InputGroup.Text>
+                                                {param.as && param.as({value: content.additionalParams.cameraId || '', disabled: content.loading, onChange: handleSearchOnChange})}
+                                                {param.type &&
+                                                    <Form.Control defaultValue={content.additionalParams[param.name] || ''} name={param.name} onChange={handleSearchOnChange} type={param.type}/>
+                                                }
+                                            </React.Fragment>
+                                        );
+                                    })}
+                                </>
+                            }
                         </InputGroup>
                         {canCreate &&
                         <ButtonGroup>

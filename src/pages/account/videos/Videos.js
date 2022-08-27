@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Button, Modal } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { Button, Form, Modal } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import MotionVideo from "../../../components/cameras/MotionVideo";
 import { icons } from "../../../components/common/Icons";
@@ -13,11 +13,39 @@ function Videos() {
         item: {}
     });
 
+    const [ cameras, setCameras ] = useState({
+        items: [],
+        nextToken: null,
+        loading: true
+    });
+
+    useEffect(() => {
+        let isMounted = true;
+        if (cameras.loading) {
+            pitsService.cameras().list({ nextToken: cameras.nextToken }).then(resp => {
+                if (isMounted) {
+                    setCameras({
+                        ...cameras,
+                        items: cameras.items.concat(resp.items),
+                        nextToken: resp.nextToken,
+                        loading: resp.nextToken !== null
+                    });
+                }
+            });
+        }
+        return () => {
+            isMounted = false;
+        };
+    });
+
+    const thingToDisplay = {};
+    cameras.items.forEach(camera => thingToDisplay[camera.thingName] = camera.displayName);
+
     const columns = [
         {
             label: 'Camera',
             format: (item) => {
-                return <Link to={`/account/cameras/${item.thingName}/configuration`}>{item.thingName}</Link>
+                return <Link to={`/account/cameras/${item.thingName}/configuration`}>{thingToDisplay[item.thingName] || item.thingName}</Link>
             }
         },
         {
@@ -57,6 +85,36 @@ function Videos() {
 
     const editLink = item => `/account/videos/${item.motionVideo}/cameras/${item.thingName}`;
 
+    const searchParams = [
+        {
+            'name': 'startTime',
+            'label': 'After',
+            'type': 'date',
+        },
+        {
+            'name': 'endTime',
+            'label': 'Before',
+            'type': 'date'
+        },
+        {
+            'name': 'cameraId',
+            'label': 'Camera',
+            'as': ({value, disabled, onChange}) => {
+                return (
+                    <Form.Select name="cameraId" defaultValue={value} onChange={onChange} disabled={disabled || cameras.loading}>
+                        <option value="">All</option>
+                        {cameras.items.map(camera => {
+                            return <option key={`camera-${camera.thingName}`} value={camera.thingName}>{camera.displayName}</option>
+                        })}
+                    </Form.Select>
+                );
+            },
+            'resource': (resource, value) => {
+                return value === '' ? resource : pitsService.cameras().resource(value, 'videos');
+            }
+        }
+    ];
+
     return (
         <>
             <Modal size="lg" show={modal.visible} onHide={handleModalClose}>
@@ -78,6 +136,7 @@ function Videos() {
                 resource="videos"
                 resourceTitle="Motion Video"
                 resourceId="motionVideo"
+                searchParams={searchParams}
                 handleDelete={handleDelete}
                 formatEdit={editLink}
                 formatTimestamp={createTime => `${formatDate(createTime)} ${formatTime(createTime)}`}
