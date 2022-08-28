@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Button, Container, Form } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import CancelButton from "../../../components/common/CancelButton";
-import Footer from "../../../components/common/Footer";
 import { useAlerts } from "../../../components/notifications/AlertContext";
 import AssociateControl from "../../../components/resource/AssociateControl";
 import { pitsService } from "../../../lib/services";
@@ -133,7 +132,6 @@ function CreateGroup() {
                     <CancelButton className="me-1" disabled={data.submitting}/>
                     <Button disabled={data.submitting} type="submit" variant="success">{create ? 'Create' : 'Update'}</Button>
                 </Form>
-                <Footer/>
             </Container>
         </>
     );

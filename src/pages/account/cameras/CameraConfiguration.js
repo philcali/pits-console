@@ -3,9 +3,9 @@ import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import CameraCard from "../../../components/cameras/CameraCard";
 import CancelButton from "../../../components/common/CancelButton";
-import Footer from "../../../components/common/Footer";
 import Header from "../../../components/common/Header";
 import { useAlerts } from "../../../components/notifications/AlertContext";
+import MotionVideoList from "../../../components/videos/MotionVideoList";
 import { pitsService } from "../../../lib/services";
 
 const LEVELS = [
@@ -225,7 +225,8 @@ function CameraConfiguration() {
                         </Col>
                     </Row>
                 </Form>
-                <Footer/>
+                <hr/>
+                <MotionVideoList cameraId={cameraId}/>
             </Container>
         </>
     );

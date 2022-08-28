@@ -1,8 +1,9 @@
+import { Container } from 'react-bootstrap';
 import settings from '../../lib/settings.json';
 
 function Footer() {
     return (
-        <>
+        <Container>
             <hr/>
             <footer className="container">
                 <p>
@@ -10,7 +11,7 @@ function Footer() {
                     {settings.companyName || 'Calico.'} {new Date().getFullYear()}
                 </p>
             </footer>
-        </>
+        </Container>
     );
 }
 

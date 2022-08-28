@@ -16,6 +16,7 @@ import CameraMutate from './pages/account/cameras/CameraMutate';
 import CameraConfiguration from './pages/account/cameras/CameraConfiguration';
 import Videos from './pages/account/videos/Videos';
 import VideoMutate from './pages/account/videos/VideoMutate';
+import Footer from './components/common/Footer';
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
               <Route path="/login" element={<Login/>}/>
               <Route path="/logout" element={<Logout/>}/>
             </Routes>
+            <Footer/>
           </AlertNotifications>
         </main>
       </Router>
