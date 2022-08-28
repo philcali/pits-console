@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Col, Container, Row, Spinner } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import CameraCard from "../components/cameras/CameraCard";
-import Footer from "../components/common/Footer";
 import { pitsService } from "../lib/services";
 
 function Dashboard() {
@@ -158,7 +157,6 @@ function Dashboard() {
                     </p>
                 </div>
             }
-            <Footer/>
         </Container>
     );
 }

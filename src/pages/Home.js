@@ -1,7 +1,6 @@
 import { Button, Col, Container, Row } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { useAuth } from "../components/auth/AuthContext";
-import Footer from "../components/common/Footer";
 import { icons } from "../components/common/Icons";
 import { authService } from "../lib/services";
 
@@ -37,7 +36,6 @@ function Home() {
                         <p>Be alerted whenever there is movement.</p>
                     </Col>
                 </Row>
-                <Footer/>
             </Container> 
         </>
     );

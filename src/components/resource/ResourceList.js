@@ -13,7 +13,6 @@ import {
 import { Link } from "react-router-dom";
 import { formatDate } from "../../lib/format";
 import { pitsService } from "../../lib/services";
-import Footer from "../common/Footer";
 import { icons } from "../common/Icons";
 import { useAlerts } from "../notifications/AlertContext";
 import ResourcePagination from "./ResourcePagination";
@@ -23,7 +22,9 @@ function ResourceList(props) {
     const canCreate = props.create === true || typeof(props.create) === 'undefined';
     let [ content, setContent ] = useState({
         items: [],
-        additionalParams: {},
+        additionalParams: {
+            ...(props.additionalParams || {})
+        },
         currentSlice: [0, props.pagination || 10],
         nextToken: null,
         loading: true
@@ -190,19 +191,23 @@ function ResourceList(props) {
                 <div className="mb-3">
                     <ButtonToolbar className="justify-content-between mb-md-0">
                         <InputGroup>
-                            <InputGroup.Text>{icons.icon('search')}</InputGroup.Text>
-                            <Form.Control
-                                value={search.text}
-                                onChange={(event) => setSearch({text: event.currentTarget.value})}
-                                placeholder="Search"
-                            />
+                            {props.hideSearchText !== true &&
+                            <>
+                                <InputGroup.Text>{icons.icon('search')}</InputGroup.Text>
+                                <Form.Control
+                                    value={search.text}
+                                    onChange={(event) => setSearch({text: event.currentTarget.value})}
+                                    placeholder="Search"
+                                />
+                            </>
+                            }
                             {props.searchParams &&
                                 <>
-                                    {props.searchParams.map(param => {
+                                    {props.searchParams.filter(param => !(param.hideIfSet === true && props.additionalParams[param.name])).map(param => {
                                         return (
                                             <React.Fragment key={`param-${param.name}`}>
                                                 <InputGroup.Text>{param.label}</InputGroup.Text>
-                                                {param.as && param.as({value: content.additionalParams.cameraId || '', disabled: content.loading, onChange: handleSearchOnChange})}
+                                                {param.as && param.as({value: content.additionalParams[param.name] || '', disabled: content.loading, onChange: handleSearchOnChange})}
                                                 {param.type &&
                                                     <Form.Control defaultValue={content.additionalParams[param.name] || ''} name={param.name} onChange={handleSearchOnChange} type={param.type}/>
                                                 }
@@ -261,7 +266,6 @@ function ResourceList(props) {
                         </tr>
                     </tfoot>
                 </Table>
-                <Footer/>
             </Container>
         </>
     );

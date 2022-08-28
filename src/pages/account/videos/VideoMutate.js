@@ -3,7 +3,6 @@ import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import MotionVideo from "../../../components/cameras/MotionVideo";
 import CancelButton from "../../../components/common/CancelButton";
-import Footer from "../../../components/common/Footer";
 import Header from "../../../components/common/Header";
 import { icons } from "../../../components/common/Icons";
 import { useAlerts } from "../../../components/notifications/AlertContext";
@@ -139,7 +138,6 @@ function VideoMutate() {
                         </Col>
                     </Row>
                 </Form>
-                <Footer/>
             </Container>
         </>
     );

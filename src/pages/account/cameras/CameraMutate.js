@@ -3,10 +3,10 @@ import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import CameraCard from "../../../components/cameras/CameraCard";
 import CancelButton from "../../../components/common/CancelButton";
-import Footer from "../../../components/common/Footer";
 import Header from "../../../components/common/Header";
 import { useAlerts } from "../../../components/notifications/AlertContext";
 import AssociateControl from "../../../components/resource/AssociateControl";
+import MotionVideoList from "../../../components/videos/MotionVideoList";
 import { pitsService } from "../../../lib/services";
 
 function CameraMutate() {
@@ -247,7 +247,8 @@ function CameraMutate() {
                     <CancelButton className="me-1" disabled={data.submitting}/>
                     <Button disabled={data.submitting || !formData.thingName} type="submit" variant="success">{create ? 'Create' : 'Update'}</Button>
                 </Form>
-                <Footer/>
+                <hr/>
+                <MotionVideoList cameraId={cameraId}/>
             </Container>
         </>
     );
