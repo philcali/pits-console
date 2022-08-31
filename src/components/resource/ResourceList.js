@@ -175,9 +175,9 @@ function ResourceList(props) {
         <>
             <Modal show={modal.visible} onHide={handleModalClose}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Delete {modal.item[props.resourceId]}</Modal.Title>
+                    <Modal.Title>Delete {props.formatResource ? props.formatResource(modal.item) : modal.item[props.resourceId]}</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>Are you sure you want to delete <strong>{modal.item[props.resourceId]}</strong>?</Modal.Body>
+                <Modal.Body>Are you sure you want to delete <strong>{props.formatResource ? props.formatResource(modal.item) : modal.item[props.resourceId]}</strong>?</Modal.Body>
                 <Modal.Footer>
                     <Button variant="outline-secondary" onClick={handleModalClose}>Cancel</Button>
                     <Button variant="danger" disabled={modal.submitting} onClick={handleItemDelete}>Delete</Button>

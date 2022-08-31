@@ -15,10 +15,10 @@ function Navigation() {
             active: location.pathname === href
         }
     };
-    const text = auth.user.session ? 'Dashboard' : 'Home';
+    const text = auth.isLoggedIn() ? 'Dashboard' : 'Home';
     const accountTitle = (
         <span>{icons.icon('person-circle')} Account</span>
-    )
+    );
     return (
         <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark" sticky="top">
             <Container fluid>
@@ -34,14 +34,15 @@ function Navigation() {
                 <Navbar.Toggle aria-controls="responsive-navbar-nav"/>
                 <Navbar.Collapse id="responsive-navbar-nav">
                     <Nav className="me-auto">
-                        <Nav.Link {...setHrefAndActive(auth.user.session ? '/dashboard' : '/')} >{text}</Nav.Link>
+                        <Nav.Link {...setHrefAndActive(auth.isLoggedIn() ? '/dashboard' : '/')} >{text}</Nav.Link>
                     </Nav>
-                    { auth.user.session &&
+                    {auth.isLoggedIn() &&
                         <Nav>
                             <NavDropdown active={location.pathname.match(/^\/account/)} title={accountTitle}>
                                 <NavDropdown.Item {...setHrefAndActive('/account/groups')}>Groups</NavDropdown.Item>
                                 <NavDropdown.Item {...setHrefAndActive('/account/cameras')}>Cameras</NavDropdown.Item>
                                 <NavDropdown.Item {...setHrefAndActive('/account/videos')}>Motion Videos</NavDropdown.Item>
+                                <NavDropdown.Item {...setHrefAndActive('/account/subscriptions')}>Subscriptions</NavDropdown.Item>
                             </NavDropdown>
                             <Nav.Link href={authService.logoutEndpoint(window.location.origin)}>{icons.icon('box-arrow-right')} <small>Log Out</small></Nav.Link>
                         </Nav>

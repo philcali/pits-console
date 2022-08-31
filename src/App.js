@@ -17,11 +17,13 @@ import CameraConfiguration from './pages/account/cameras/CameraConfiguration';
 import Videos from './pages/account/videos/Videos';
 import VideoMutate from './pages/account/videos/VideoMutate';
 import Footer from './components/common/Footer';
+import Subscriptions from './pages/account/subscriptions/Subscriptions';
+import SubscriptionMutate from './pages/account/subscriptions/SubscriptionMutate';
 
 function App() {
   return (
-    <ProvideAuth>
-      <Router>
+    <Router>
+      <ProvideAuth>
         <Navigation/>
         <main>
           <AlertNotifications>
@@ -36,14 +38,16 @@ function App() {
               <Route path="/account/groups/:groupId" element={<PrivateRoute><CreateGroup/></PrivateRoute>}/>
               <Route path="/account/videos" element={<PrivateRoute><Videos/></PrivateRoute>}/>
               <Route path="/account/videos/:motionVideo/cameras/:cameraId" element={<PrivateRoute><VideoMutate/></PrivateRoute>}/>
+              <Route path="/account/subscriptions" element={<PrivateRoute><Subscriptions/></PrivateRoute>}/>
+              <Route path="/account/subscriptions/:id" element={<PrivateRoute><SubscriptionMutate/></PrivateRoute>}/>
               <Route path="/login" element={<Login/>}/>
               <Route path="/logout" element={<Logout/>}/>
             </Routes>
             <Footer/>
           </AlertNotifications>
         </main>
-      </Router>
-    </ProvideAuth>
+      </ProvideAuth>
+    </Router>
   );
 }
 

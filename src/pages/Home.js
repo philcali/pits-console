@@ -7,7 +7,7 @@ import { authService } from "../lib/services";
 
 function Home() {
     const auth = useAuth();
-    const link = auth.user.session ? (
+    const link = auth.isLoggedIn() ? (
         <Button to="/dashboard" as={Link} variant="success">Get Started</Button>
     ) : (
         <Button href={authService.loginEndpoint(window.location.origin)} variant="primary">Login</Button>

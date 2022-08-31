@@ -20,8 +20,9 @@ function Login() {
     const response = parseClientTokenResponse(location.hash);
     useEffect(() => {
         if (response['access_token']) {
-            auth.login(response);
-            navigate("/", { replace: true });
+            auth.login(response).finally(() => {
+                navigate("/", { replace: true });
+            });
         }
     });
     return (
