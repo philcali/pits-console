@@ -1,39 +1,61 @@
 import { useState } from "react";
 import { AuthContext } from "./AuthContext";
 import { siteSessions } from "../../lib/session";
-
-const TIMEOUT = 1000;
+import { authService } from "../../lib/services";
 
 function useProvideAuth() {
     const [ user, setUser ] = useState({
-        session: siteSessions.sessionToken()
+        session: siteSessions.sessionToken(),
+        loading: true,
     });
+
+    if (user.loading) {
+        if (user.session) {
+            authService.userInfo()
+                .then(resp => {
+                    setUser({
+                        ...user,
+                        ...resp,
+                        loading: false
+                    });
+                })
+                .catch(e => {
+                    setUser({
+                        ...user,
+                        loading: false
+                    });
+                })
+        } else {
+            setUser({
+                ...user,
+                loading: false
+            });
+        }
+    }
 
     let logout = () => {
         siteSessions.clear();
         setUser({
+            loading: false,
             session: null
         });
     };
 
-    let login = (clientToken) => {
+    let login = async (clientToken) => {
         siteSessions.update(clientToken);
         setUser({
-            session: siteSessions.sessionToken()
+            loading: true,
+            session: siteSessions.sessionToken(),
         });
     };
 
-    setInterval(() => {
-        let session = siteSessions.sessionToken()
-        if (user.session !== session) {
-            setUser({
-                session
-            });
-        }
-    }, TIMEOUT);
+    let isLoggedIn = () => {
+        return !!siteSessions.sessionToken();
+    };
 
     return {
         user,
+        isLoggedIn,
         login,
         logout
     }

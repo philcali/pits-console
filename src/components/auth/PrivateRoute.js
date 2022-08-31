@@ -4,9 +4,9 @@ import { useAuth } from "./AuthContext";
 function PrivateRoute({ children }) {
     const auth = useAuth();
     const location = useLocation();
-    if (auth.user.session && location.pathname === '/') {
+    if (auth.isLoggedIn() && location.pathname === '/') {
         return <Navigate to="/dashboard" state={{ from: location }} replace />;
-    } else if (auth.user.session || location.pathname === '/') {
+    } else if (auth.isLoggedIn() || location.pathname === '/') {
         return children;
     } else {
         return <Navigate to="/" state={{ from: location }} replace />;

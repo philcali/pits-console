@@ -71,6 +71,7 @@ class Resource extends BaseService {
                 'Content-Type': 'application/json'
             }
         })
+        .then(this.throwOnError)
         .then(resp => resp.json());
     }
 
@@ -78,6 +79,7 @@ class Resource extends BaseService {
         return this.request(`/${this.name}/${itemId}`,{
                 method: 'DELETE'
             })
+            .then(this.throwOnError)
             .then(resp => resp.ok);
     }
 
@@ -188,7 +190,7 @@ class PitsService extends BaseService {
     }
 }
 
-['cameras', 'groups', 'videos'].forEach(resource => {
+['cameras', 'groups', 'videos', 'subscriptions'].forEach(resource => {
     PitsService.prototype[resource] = function name() {
         return this.resource(resource);
     };
