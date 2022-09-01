@@ -21,7 +21,7 @@ function Login() {
     useEffect(() => {
         if (response['access_token']) {
             auth.login(response).finally(() => {
-                navigate("/", { replace: true });
+                navigate(response['state'] || "/", { replace: true });
             });
         }
     });
