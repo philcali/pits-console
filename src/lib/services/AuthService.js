@@ -13,12 +13,15 @@ class AuthService extends BaseService {
         return this.request('/oauth2/userInfo').then(resp => resp.json());
     }
 
-    loginEndpoint(currentHost) {
+    loginEndpoint(currentHost, from) {
         let params = [
             'response_type=token',
             `client_id=${CLIENT_ID}`,
-            `redirect_uri=${currentHost}/login`
+            `redirect_uri=${currentHost}/login`,
         ];
+        if (typeof from !== 'undefined') {
+            params.push(`state=${from}`);
+        }
         return `${this.endpoint}/oauth2/authorize?${params.join('&')}`;
     }
 
