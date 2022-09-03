@@ -227,11 +227,9 @@ function SubscriptionMutate() {
     };
 
     const toggleCustomRange = event => {
-        let hours = formData.filter['Hour'];
+        let hours = [];
         if (event.target.checked) {
             hours = [{'numeric': ['>=', 0, '<=', 23]}];
-        } else {
-            hours = [];
         }
         setFormData({...formData, filter: {...formData.filter, 'Hour': hours}});
     };
