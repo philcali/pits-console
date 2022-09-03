@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Col, Container, Form, Row } from "react-bootstrap";
+import { Button, ButtonGroup, Col, Container, Form, Row, ToggleButton } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../../components/auth/AuthContext";
 import CancelButton from "../../../components/common/CancelButton";
@@ -16,7 +16,8 @@ function SubscriptionMutate() {
     const [ formData, setFormData ] = useState({
         id: create ? '' : id,
         endpoint: user.email || '',
-        protocol: 'email'
+        protocol: 'email',
+        filter: {}
     });
     const [ data, setData ] = useState({
         validated: false,
@@ -24,7 +25,7 @@ function SubscriptionMutate() {
     });
     const [ content, setContent ] = useState({
         id,
-        loading: !create
+        loading: !create,
     });
 
     useEffect(() => {
@@ -33,7 +34,10 @@ function SubscriptionMutate() {
             pitsService.subscriptions().get(id)
                 .then(existing => {
                     if (isMounted) {
-                        setFormData(existing);
+                        setFormData({
+                            ...formData,
+                            ...existing
+                        });
                     }
                 })
                 .catch(e => {
@@ -106,6 +110,10 @@ function SubscriptionMutate() {
         })
     };
 
+    const updateFilter = event => {
+        console.log(event);
+    };
+
     return (
         <>
             <Container>
@@ -123,6 +131,59 @@ function SubscriptionMutate() {
                             <Form.Select disabled={!create} onChange={inputChange} name="protocol" value={formData.protocol}>
                                 <option value="email">Email</option>
                             </Form.Select>
+                        </Form.Group>
+                    </Row>
+                    <h3>
+                        Filters
+                    </h3>
+                    <Row className="mb-3">
+                        <Form.Group as={Col}>
+                            <Form.Label>Group</Form.Label>
+                            <br/>
+                        </Form.Group>
+                        <Form.Group as={Col}>
+                            <Form.Label>Camera</Form.Label>
+                            <br/>
+                        </Form.Group>
+                        <Form.Group as={Col}>
+                            <Form.Label>Days Of Week</Form.Label>
+                            <br/>
+                            <ButtonGroup vertical>
+                                {['Mon', 'Tues', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, index) => {
+                                    return (
+                                        <ToggleButton
+                                            key={`day-${index}`}
+                                            type="checkbox"
+                                            checked={false}
+                                            variant="outline-success"
+                                            value={index}
+                                            onChange={updateFilter}
+                                        >
+                                            {day}
+                                        </ToggleButton>
+                                    );
+                                })}
+                            </ButtonGroup>
+                        </Form.Group>
+                        <Form.Group as={Col}>
+                            <Form.Label>Hours Of Day</Form.Label>
+                            <br/>
+                            <ButtonGroup vertical>
+                                {Array(24).fill().map((num, index) => {
+                                    return (
+                                        <ToggleButton
+                                            key={`hour-${index}`}
+                                            type="checkbox"
+                                            checked={false}
+                                            variant="outline-success"
+                                            value={index}
+                                            onChange={updateFilter}
+                                        >
+                                            {index}
+                                        </ToggleButton>
+                                    )
+                                })}
+                            </ButtonGroup>
                         </Form.Group>
                     </Row>
                     <CancelButton className="me-1" disabled={data.submitting}/>
