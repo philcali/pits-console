@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import CameraCard from "../../../components/cameras/CameraCard";
+import AccountBreadcrumb from "../../../components/common/AccountBreadcrumb";
 import CancelButton from "../../../components/common/CancelButton";
 import Header from "../../../components/common/Header";
+import { icons } from "../../../components/common/Icons";
 import { useAlerts } from "../../../components/notifications/AlertContext";
 import AssociateControl from "../../../components/resource/AssociateControl";
 import MotionVideoList from "../../../components/videos/MotionVideoList";
@@ -188,6 +190,7 @@ function CameraMutate() {
 
     return (
         <>
+            <AccountBreadcrumb replace={{[cameraId]: formData.displayName}}/>
             <Container>
                 <Header>
                     {create ? 'Create Camera' : `Update ${formData.thingName}`}
@@ -245,6 +248,9 @@ function CameraMutate() {
                     </>
                     }
                     <CancelButton className="me-1" disabled={data.submitting}/>
+                    {!create &&
+                    <Button className="me-1" variant="primary" as={Link} to={`/account/cameras/${cameraId}/configuration`}>{icons.icon('card-list')} Configure</Button>
+                    }
                     <Button disabled={data.submitting || !formData.thingName} type="submit" variant="success">{create ? 'Create' : 'Update'}</Button>
                 </Form>
                 <hr/>

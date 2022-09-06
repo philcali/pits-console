@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Button, Col, Container, Form, InputGroup, Row, Spinner, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../../components/auth/AuthContext";
+import AccountBreadcrumb from "../../../components/common/AccountBreadcrumb";
 import CancelButton from "../../../components/common/CancelButton";
 import Header from "../../../components/common/Header";
 import { useAlerts } from "../../../components/notifications/AlertContext";
@@ -250,6 +251,7 @@ function SubscriptionMutate() {
 
     return (
         <>
+            <AccountBreadcrumb replace={{[id]: formData.endpoint}}/>
             <Container>
                 <Header>
                     {create ? 'Create Subscription' : `Update ${formData.endpoint}`}
