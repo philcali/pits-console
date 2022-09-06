@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import MotionVideo from "../../../components/cameras/MotionVideo";
+import AccountBreadcrumb from "../../../components/common/AccountBreadcrumb";
 import CancelButton from "../../../components/common/CancelButton";
 import Header from "../../../components/common/Header";
 import { icons } from "../../../components/common/Icons";
@@ -92,6 +93,7 @@ function VideoMutate() {
 
     return (
         <>
+            <AccountBreadcrumb skipParts={['cameras', cameraId]}/>
             <Container>
                 <Header>Update {motionVideo}</Header>
                 <Form noValidate validated={data.validated} onSubmit={handleSubmit}>

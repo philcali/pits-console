@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Badge, Button, Spinner, Table } from "react-bootstrap";
+import { Link } from "react-router-dom";
 import { pitsService } from "../../lib/services";
 import { icons } from "../common/Icons";
 
@@ -102,7 +103,10 @@ function AssociateControl(props) {
                            return (
                                <tr key={`${props.associatedResource}-${other[props.associatedResourceId]}`}>
                                    <td><Badge text={isAssociated ? 'light' : 'dark'} bg={isAssociated ? 'success' : 'light'}>{other[props.associatedResourceId]}</Badge></td>
-                                   <td><Button disabled={associated.loading} size="sm" onClick={toggleAssociate(other[props.associatedResourceId], isAssociated)} variant="primary">{icons.icon(isAssociated ? 'minus' : 'plus')} Toggle</Button></td>
+                                   <td>
+                                        <Button className="me-2" as={Link} to={`/account/${props.associatedResource}/${other[props.associatedResourceId]}`} variant="outline-secondary" size="sm">{icons.icon('pencil')}</Button>
+                                        <Button disabled={associated.loading} size="sm" onClick={toggleAssociate(other[props.associatedResourceId], isAssociated)} variant="primary">{icons.icon(isAssociated ? 'minus' : 'plus')} Toggle</Button>
+                                    </td>
                                </tr>
                            );
                        })}

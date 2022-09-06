@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import CameraCard from "../../../components/cameras/CameraCard";
+import AccountBreadcrumb from "../../../components/common/AccountBreadcrumb";
 import CancelButton from "../../../components/common/CancelButton";
 import Header from "../../../components/common/Header";
+import { icons } from "../../../components/common/Icons";
 import { useAlerts } from "../../../components/notifications/AlertContext";
 import MotionVideoList from "../../../components/videos/MotionVideoList";
 import { pitsService } from "../../../lib/services";
@@ -138,6 +140,7 @@ function CameraConfiguration() {
 
     return (
         <>
+            <AccountBreadcrumb replace={{[cameraId]: cameraData.displayName }} />
             <Container>
                 <Header>
                     Configuring {cameraData.displayName || cameraId}
@@ -219,6 +222,7 @@ function CameraConfiguration() {
                             <Row>
                                 <Col className="text-center">
                                     <CancelButton className="me-2" disabled={data.submitting}/>
+                                    <Button className="me-2" as={Link} to={`/account/cameras/${cameraId}`} variant="outline-secondary">{icons.icon('pencil')} Edit</Button>
                                     <Button disabled={data.submitting || formData.loading} type="submit" variant="success">Update</Button>
                                 </Col>
                             </Row>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import CameraCard from "../../../components/cameras/CameraCard";
+import AccountBreadcrumb from "../../../components/common/AccountBreadcrumb";
 import { icons } from "../../../components/common/Icons";
 import ResourceList from "../../../components/resource/ResourceList";
 
@@ -67,6 +68,7 @@ function Cameras() {
                     <Button variant="primary" as={Link} to={`/account/cameras/${modal.item.thingName}/configuration`}>{icons.icon('card-list')} Configure</Button>
                 </Modal.Footer>
             </Modal>
+            <AccountBreadcrumb/>
             <ResourceList
                 resource="cameras"
                 resourceTitle="Camera"

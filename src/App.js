@@ -19,6 +19,7 @@ import VideoMutate from './pages/account/videos/VideoMutate';
 import Footer from './components/common/Footer';
 import Subscriptions from './pages/account/subscriptions/Subscriptions';
 import SubscriptionMutate from './pages/account/subscriptions/SubscriptionMutate';
+import ManageAccount from './pages/account/ManageAccount';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
             <Routes>
               <Route path="/" element={<PrivateRoute><Home/></PrivateRoute>}/>
               <Route path="/dashboard" element={<PrivateRoute><Dashboard/></PrivateRoute>}/>
+              <Route path="/account" element={<PrivateRoute><ManageAccount/></PrivateRoute>}/>
               <Route path="/account/cameras" element={<PrivateRoute><Cameras/></PrivateRoute>}/>
               <Route path="/account/cameras/:cameraId" element={<PrivateRoute><CameraMutate/></PrivateRoute>}/>
               <Route path="/account/cameras/:cameraId/configuration" element={<PrivateRoute><CameraConfiguration/></PrivateRoute>}/>

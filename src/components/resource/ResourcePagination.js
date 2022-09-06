@@ -14,7 +14,7 @@ function ResourcePagination(props) {
         let pages = total / perPage;
         let extra = total <= perPage ? 0 : total % perPage;
         let numbers = [];
-        for (let index = 1; index < (pages + ((extra > 0 || canLoadMore) ? 1 : 0)); index++) {
+        for (let index = 1; index < (pages + ((extra >= 0 || canLoadMore) ? 1 : 0)); index++) {
             numbers.push(index);
         }
         return numbers;

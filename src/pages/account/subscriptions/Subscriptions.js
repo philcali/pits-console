@@ -1,3 +1,4 @@
+import AccountBreadcrumb from "../../../components/common/AccountBreadcrumb";
 import { icons } from "../../../components/common/Icons";
 import ResourceList from "../../../components/resource/ResourceList";
 
@@ -21,13 +22,16 @@ function Subscriptions() {
     ];
 
     return (
-        <ResourceList
-            resource="subscriptions"
-            resourceTitle="Subscription"
-            resourceId="id"
-            formatResource={item => item.endpoint}
-            columns={columns}
-        />
+        <>
+            <AccountBreadcrumb/>
+            <ResourceList
+                resource="subscriptions"
+                resourceTitle="Subscription"
+                resourceId="id"
+                formatResource={item => item.endpoint}
+                columns={columns}
+            />
+        </>
     );
 }
 

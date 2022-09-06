@@ -1,3 +1,4 @@
+import AccountBreadcrumb from "../../../components/common/AccountBreadcrumb";
 import ResourceList from "../../../components/resource/ResourceList";
 
 function Groups() {
@@ -9,12 +10,15 @@ function Groups() {
     ];
 
     return (
-        <ResourceList
-            resource="groups"
-            resourceTitle="Group"
-            resourceId="name"
-            columns={columns}
-        />
+        <>
+            <AccountBreadcrumb/>
+            <ResourceList
+                resource="groups"
+                resourceTitle="Group"
+                resourceId="name"
+                columns={columns}
+            />
+        </>
     );
 }
 
