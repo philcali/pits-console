@@ -61,6 +61,7 @@ function Navigation() {
                                     <NavDropdown.Item {...setHrefAndActive('/account/groups')}>Groups</NavDropdown.Item>
                                     <NavDropdown.Item {...setHrefAndActive('/account/cameras')}>Cameras</NavDropdown.Item>
                                     <NavDropdown.Item {...setHrefAndActive('/account/videos')}>Motion Videos</NavDropdown.Item>
+                                    <NavDropdown.Item {...setHrefAndActive('/account/tags')}>Tags</NavDropdown.Item>
                                     <NavDropdown.Item {...setHrefAndActive('/account/subscriptions')}>Subscriptions</NavDropdown.Item>
                                 </NavDropdown>
                                 <Nav.Link href={authService.logoutEndpoint(window.location.origin)}>{icons.icon('box-arrow-left')} <small>Log Out</small></Nav.Link>

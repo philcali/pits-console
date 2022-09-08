@@ -48,7 +48,7 @@ function ResourceCard(props) {
     });
 
     return (
-        <Card className="text-center">
+        <Card className="text-center mt-2">
             <Card.Header as="h4">{props.title}</Card.Header>
             <Card.Body>
                 {resource.loading && <Spinner animation="border"/>}
@@ -120,8 +120,8 @@ function ManageAccount() {
             <AccountBreadcrumb/>
             <Container>
                 <Header>Manage Account</Header>
-                <Row xs={1} md={3}>
-                    {["Groups", "Cameras", "Subscriptions"].map(resource => {
+                <Row xs={1} lg={4} md={2}>
+                    {["Groups", "Cameras", "Subscriptions", "Tags"].map(resource => {
                         return (
                             <Col key={`resource-${resource}`}>
                                 <ResourceCard

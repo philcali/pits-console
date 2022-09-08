@@ -7,23 +7,22 @@ function useProviderAlerts() {
     let [ alerts, setAlerts ] = useState([]);
 
     const notify = alert => {
+        let timestamp = Date.now();
         let newAlert = {
             ...alert,
-            timestamp: Date.now(),
+            timestamp,
+            timeout: timestamp + (alert.timeout || TIMEOUT),
             showing: true
         };
-        let timeoutId = setTimeout(() => close(newAlert), alert.timeout || TIMEOUT);
         setAlerts([
             ...alerts, {
-                ...newAlert,
-                timeoutId
+                ...newAlert
             }
         ]);
     };
 
     const close = alert => {
-        clearTimeout(alert.timeout);
-        setAlerts(alerts.filter(a => a.timestamp !== alert.timestamp));
+        setAlerts(alerts.filter(a => a !== alert));
     };
 
     const success = message => {
@@ -42,11 +41,21 @@ function useProviderAlerts() {
         });
     };
 
+    const sweep = () => {
+        let alert = alerts[0];
+        if (alert) {
+            let now = Date.now();
+            return setTimeout(() => close(alert), alert.timeout - now);
+        }
+        return null;
+    }
+
     return {
         alerts,
         success,
         error,
-        close
+        close,
+        sweep
     }
 }
 
