@@ -28,6 +28,8 @@ function AccountBreadcrumb(props) {
             element.text = 'Motion Videos';
         } else if (part === 'configuration') {
             element.text = 'Configuration';
+        } else if (part === 'tags') {
+            element.text = 'Tags';
         } else {
             element.text = part;
         }
