@@ -170,6 +170,17 @@ function ResourceList(props) {
     };
 
     const searchedItems = content.items.filter(item => item[props.resourceId].match(search.text));
+    const hideIfSet = param => {
+        if (param.hideIfSet) {
+            let keys = Object.keys(props.additionalParams); 
+            for (let index = 0; index < keys.length; index++) {
+                if (param.hideIfSet.indexOf(keys[index]) !== -1) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    };
 
     return (
         <>
@@ -203,11 +214,11 @@ function ResourceList(props) {
                             }
                             {props.searchParams &&
                                 <>
-                                    {props.searchParams.filter(param => !(param.hideIfSet === true && props.additionalParams[param.name])).map(param => {
+                                    {props.searchParams.filter(hideIfSet).map(param => {
                                         return (
                                             <React.Fragment key={`param-${param.name}`}>
                                                 <InputGroup.Text>{param.label}</InputGroup.Text>
-                                                {param.as && param.as({value: content.additionalParams[param.name] || '', disabled: content.loading, onChange: handleSearchOnChange})}
+                                                {param.as && param.as({value: content.additionalParams[param.name] || '', disabled: content.loading || content.additionalParams[param.disabledIfSet], onChange: handleSearchOnChange})}
                                                 {param.type &&
                                                     <Form.Control defaultValue={content.additionalParams[param.name] || ''} name={param.name} onChange={handleSearchOnChange} type={param.type}/>
                                                 }

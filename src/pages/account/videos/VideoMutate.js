@@ -7,6 +7,7 @@ import CancelButton from "../../../components/common/CancelButton";
 import Header from "../../../components/common/Header";
 import { icons } from "../../../components/common/Icons";
 import { useAlerts } from "../../../components/notifications/AlertContext";
+import TagControl from "../../../components/videos/TagControl";
 import { formatDate, formatTime } from "../../../lib/format";
 import { pitsService } from "../../../lib/services";
 
@@ -140,6 +141,12 @@ function VideoMutate() {
                         </Col>
                     </Row>
                 </Form>
+                {!formData.loading &&
+                    <>
+                        <hr/>
+                        <TagControl video={formData}/>
+                    </>
+                }
             </Container>
         </>
     );

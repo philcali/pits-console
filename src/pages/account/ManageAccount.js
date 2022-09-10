@@ -60,7 +60,7 @@ function ResourceCard(props) {
     )   
 }
 
-function LatestCapturedVideoCard() {
+function LatestCapturedVideoCard(props) {
     const alerts = useAlerts();
     const [ latestVideo, setLatestVideo ] = useState({
         loading: true
@@ -132,7 +132,7 @@ function ManageAccount() {
                         );
                     })}
                 </Row>
-                <Row className="mt-3" xs={1} md={2}>
+                <Row className="mt-3" xs={1} lg={2} md={1}>
                     <Col>
                         <LatestCapturedVideoCard/>
                     </Col>
