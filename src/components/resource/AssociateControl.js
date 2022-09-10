@@ -77,17 +77,17 @@ function AssociateControl(props) {
         };
     };
 
-    const assocaitedMap = {};
+    const associatedMap = {};
     if (!other.loading && !associated.loading) {
         associated.items.forEach(associated => {
-            assocaitedMap[associated.id] = associated;
+            associatedMap[associated.id] = associated;
         });
     }
 
     return (
         <>
-           <h3 className="mb-3" style={{borderBottom: '1px solid #ddd'}}>Associated {props.title}</h3>
-           <Table responsive>
+            <h3 className="mb-3" style={{borderBottom: '1px solid #ddd'}}>Associated {props.title}</h3>
+            <Table responsive>
                <thead>
                    <tr>
                        <td>Name</td>
@@ -99,7 +99,7 @@ function AssociateControl(props) {
                    {!other.loading &&
                        <>
                        {other.items.map(other => {
-                           let isAssociated = assocaitedMap[other[props.associatedResourceId]];
+                           let isAssociated = associatedMap[other[props.associatedResourceId]];
                            return (
                                <tr key={`${props.associatedResource}-${other[props.associatedResourceId]}`}>
                                    <td><Badge text={isAssociated ? 'light' : 'dark'} bg={isAssociated ? 'success' : 'light'}>{other[props.associatedResourceId]}</Badge></td>
@@ -113,7 +113,7 @@ function AssociateControl(props) {
                        </>
                    }
                </tbody>
-           </Table>
+            </Table>
         </>
     )
 }

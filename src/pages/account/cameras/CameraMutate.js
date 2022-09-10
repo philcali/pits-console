@@ -238,13 +238,15 @@ function CameraMutate() {
                             <Form.Label>Description</Form.Label>
                             <Form.Control disabled={disabled} name="description" value={formData.description} onChange={inputOnChange} as='textarea'/>
                         </Form.Group>
-                        <AssociateControl
-                            title="Groups"
-                            resource="cameras"
-                            resourceId={formData.thingName}
-                            associatedResource="groups"
-                            associatedResourceId="name"
-                        />
+                        {!create &&
+                            <AssociateControl
+                                title="Groups"
+                                resource="cameras"
+                                resourceId={formData.thingName}
+                                associatedResource="groups"
+                                associatedResourceId="name"
+                            />
+                        }
                     </>
                     }
                     <CancelButton className="me-1" disabled={data.submitting}/>
@@ -254,7 +256,7 @@ function CameraMutate() {
                     <Button disabled={data.submitting || !formData.thingName} type="submit" variant="success">{create ? 'Create' : 'Update'}</Button>
                 </Form>
                 <hr/>
-                <MotionVideoList cameraId={cameraId}/>
+                {!create && <MotionVideoList cameraId={cameraId}/>}
             </Container>
         </>
     );

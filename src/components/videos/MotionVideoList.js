@@ -6,14 +6,59 @@ import { pitsService } from "../../lib/services";
 import MotionVideo from "../cameras/MotionVideo";
 import { icons } from "../common/Icons";
 import ResourceList from "../resource/ResourceList";
+import TagControl from "./TagControl";
+
+function SearchResource(props) {
+    let [ resource, setResource ] = useState({
+        items: [],
+        nextToken: null,
+        loading: true
+    });
+    if (props.existing) {
+        resource = {...props.existing, loading: false};
+        setResource = () => {};
+    }
+
+    useEffect(() => {
+        let isMounted = true;
+        if (resource.loading) {
+            pitsService[props.resource]().list({ nextToken: resource.nextToken }).then(resp => {
+                if (isMounted) {
+                    setResource({
+                        ...resource,
+                        items: resource.items.concat(resp.items),
+                        nextToken: resp.nextToken,
+                        loading: resp.nextToken !== null
+                    });
+                }
+            });
+        }
+        return () => {
+            isMounted = false;
+        };
+    });
+
+    return (
+        <Form.Select name={props.name} defaultValue={props.value} onChange={props.onChange} disabled={props.disabled || resource.loading}>
+            <option value="">{props.unsetLabel}</option>
+            {resource.items.map((item, index) => {
+                return <option key={`${props.resource}-${index}`} value={item[props.resourceId]}>{item[props.resourceDisplay]}</option>
+            })}
+        </Form.Select>
+    );
+}
 
 function MotionVideoList(props) {
     let additionalParams = {};
     if (props.cameraId) {
         additionalParams['cameraId'] = props.cameraId;
     }
+    if (props.tagId) {
+        additionalParams['tagId'] = props.tagId;
+    }
     const [ modal, setModal ] = useState({
         visible: false,
+        associateVisible: false,
         item: {}
     });
 
@@ -42,14 +87,16 @@ function MotionVideoList(props) {
         };
     });
 
-    const thingToDisplay = {};
-    cameras.items.forEach(camera => thingToDisplay[camera.thingName] = camera.displayName);
+    const thingDisplayName = {};
+    cameras.items.forEach(item => {
+        thingDisplayName[item.thingName] = item.displayName;
+    });
 
     const columns = [
         {
             label: 'Camera',
             format: (item) => {
-                return <Link to={`/account/cameras/${item.thingName}/configuration`}>{thingToDisplay[item.thingName] || item.thingName}</Link>
+                return <Link to={`/account/cameras/${item.thingName}/configuration`}>{thingDisplayName[item.thingName] || item.thingName}</Link>
             }
         },
         {
@@ -66,6 +113,19 @@ function MotionVideoList(props) {
                     setModal({
                         visible: true,
                         loading: true,
+                        associateVisible: false,
+                        item
+                    });
+                };
+            }
+        },
+        {
+            icon: 'tag',
+            onClick: item => {
+                return () => {
+                    setModal({
+                        visible: false,
+                        associateVisible: true,
                         item
                     });
                 };
@@ -84,6 +144,7 @@ function MotionVideoList(props) {
         setModal({
             ...modal,
             visible: false,
+            associateVisible: false,
         });
     }
 
@@ -103,19 +164,44 @@ function MotionVideoList(props) {
             'name': 'cameraId',
             'label': 'Camera',
             'as': ({value, disabled, onChange}) => {
-                return (
-                    <Form.Select name="cameraId" defaultValue={value} onChange={onChange} disabled={disabled || cameras.loading}>
-                        <option value="">All</option>
-                        {cameras.items.map(camera => {
-                            return <option key={`camera-${camera.thingName}`} value={camera.thingName}>{camera.displayName}</option>
-                        })}
-                    </Form.Select>
-                );
+                return <SearchResource
+                    unsetLabel="All"
+                    name="cameraId"
+                    resource="cameras"
+                    resourceId="thingName"
+                    existing={cameras}
+                    resourceDisplay="displayName"
+                    value={value}
+                    onChange={onChange}
+                    disabled={disabled}
+                />
             },
             'resource': (resource, value) => {
                 return value === '' ? resource : pitsService.cameras().resource(value, 'videos');
             },
-            'hideIfSet': true
+            'disabledIfSet': 'tagId',
+            'hideIfSet': ['cameraId', 'tagId']
+        },
+        {
+            'name': 'tagId',
+            'label': 'Tag',
+            'as': ({value, disabled, onChange}) => {
+                return <SearchResource
+                    unsetLabel="Any"
+                    name="tagId"
+                    resource="tags"
+                    resourceId="name"
+                    resourceDisplay="name"
+                    value={value}
+                    onChange={onChange}
+                    disabled={disabled}
+                />
+            },
+            'resource': (resource, value) => {
+                return value === '' ? resource : pitsService.tags().resource(value, 'videos');
+            },
+            'disabledIfSet': 'cameraId',
+            'hideIfSet': ['cameraId', 'tagId']
         }
     ];
 
@@ -125,15 +211,28 @@ function MotionVideoList(props) {
                 <Modal.Header closeButton>
                     <Modal.Title>Viewing {modal.item.motionVideo}</Modal.Title>
                 </Modal.Header>
-                <Modal.Body className="text-center">
+                <Modal.Body>
                     <MotionVideo
                         thingName={modal.item.thingName}
                         motionVideo={modal.item.motionVideo}
                     />
+                    <hr/>
+                    <TagControl video={modal.item}/>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="outline-secondary" onClick={handleModalClose}>Cancel</Button>
                     <Button variant="outline-secondary" as={Link} to={`/account/videos/${modal.item.motionVideo}/cameras/${modal.item.thingName}`}>{icons.icon('pencil')} Edit</Button>
+                </Modal.Footer>
+            </Modal>
+            <Modal size="lg" show={modal.associateVisible} onHide={handleModalClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Tag {modal.item.motionVideo}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <TagControl video={modal.item}/>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="outline-secondary" onClick={handleModalClose}>Close</Button>
                 </Modal.Footer>
             </Modal>
             <ResourceList

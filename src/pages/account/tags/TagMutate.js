@@ -5,6 +5,7 @@ import AccountBreadcrumb from "../../../components/common/AccountBreadcrumb";
 import CancelButton from "../../../components/common/CancelButton";
 import Header from "../../../components/common/Header";
 import { useAlerts } from "../../../components/notifications/AlertContext";
+import MotionVideoList from "../../../components/videos/MotionVideoList";
 import { pitsService } from "../../../lib/services";
 
 function TagMutate() {
@@ -117,6 +118,7 @@ function TagMutate() {
                     </Button>
                 </Form>
             </Container>
+            {!create && <MotionVideoList tagId={tagId}/>}
         </>
     )
 }

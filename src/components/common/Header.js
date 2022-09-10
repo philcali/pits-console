@@ -1,9 +1,15 @@
+import React from "react"
 
-function Header({ children }) {
+function Header({ children, as }) {
     return (
-        <h2 className="pt-3 pb-2 mb-3" style={{ borderBottom: '1px solid #ddd' }}>
-            {children}
-        </h2>
+        React.createElement(
+            as || 'h2',
+            {
+                className: "pb-2 mb-3",
+                style: { borderBottom: '1px solid #dddd' }
+            },
+            children
+        )
     );
 }
 
