@@ -5,6 +5,8 @@ import { useAuth } from "../../../components/auth/AuthContext";
 import AccountBreadcrumb from "../../../components/common/AccountBreadcrumb";
 import CancelButton from "../../../components/common/CancelButton";
 import Header from "../../../components/common/Header";
+import ProvideResource from "../../../components/common/ProvideResource";
+import { useResource } from "../../../components/common/ResourceContext";
 import { useAlerts } from "../../../components/notifications/AlertContext";
 import { pitsService } from "../../../lib/services";
 
@@ -19,46 +21,14 @@ function FormFilter(props) {
 }
 
 function ResourceButtons(props) {
-    const alerts = useAlerts();
-    const [ resource, setResource ] = useState({
-        items: [],
-        loading: true,
-        nextToken: null
-    });
-    useEffect(() => {
-        let isMounted = true;
-        if (resource.loading) {
-            pitsService[props.resource]().list({ nextToken: resource.nextToken })
-                .then(resp => {
-                    if (isMounted) {
-                        setResource({
-                            ...resource,
-                            items: resource.items.concat(resp.items),
-                            nextToken: resp.nextToken,
-                            loading: resp.nextToken !== null
-                        });
-                    }
-                })
-                .catch(e => {
-                    alerts.error(`Failed to load ${props.resource}: ${e.message}`);
-                    setResource({
-                        ...resource,
-                        loading: false
-                    });
-                });
-        }
-        return () => {
-            isMounted = false;
-        };
-    });
-
+    const resource = useResource();
     return (
         <ToggleButtonGroup onChange={props.onChange} value={props.filterItems} size="sm" vertical type="checkbox">
             {resource.loading && <Spinner animation="border"/>}
             {!resource.loading && resource.items.map((item, index) => {
                 return (
                     <ToggleButton
-                        key={`${props.resource}-${index}`}
+                        key={`${resource.name}-${index}`}
                         id={item[props.resourceId]}
                         variant="outline-success"
                         value={item[props.resourceId]}
@@ -275,24 +245,26 @@ function SubscriptionMutate() {
                     <Row className="mb-3">
                         <Form.Group as={Col}>
                             <FormFilter name="Group" filters={formData.filter} onChange={handleFilterToggle} label="Filter by Groups">
-                                <ResourceButtons
-                                    resource="groups"
-                                    resourceId="name"
-                                    filterItems={formData.filter["Group"]}
-                                    displayName={item => item.name}
-                                    onChange={toggleOnChange('Group')}
-                                />
+                                <ProvideResource resource="groups">
+                                    <ResourceButtons
+                                        resourceId="name"
+                                        filterItems={formData.filter["Group"]}
+                                        displayName={item => item.name}
+                                        onChange={toggleOnChange('Group')}
+                                    />
+                                </ProvideResource>
                             </FormFilter>
                         </Form.Group>
                         <Form.Group as={Col}>
                             <FormFilter name="Camera" filters={formData.filter} onChange={handleFilterToggle} label="Filter by Camera">
-                                <ResourceButtons
-                                    resource="cameras"
-                                    resourceId="thingName"
-                                    filterItems={formData.filter["Camera"]}
-                                    displayName={item => item.displayName}
-                                    onChange={toggleOnChange('Camera')}
-                                />
+                                <ProvideResource resource="cameras">
+                                    <ResourceButtons
+                                        resourceId="thingName"
+                                        filterItems={formData.filter["Camera"]}
+                                        displayName={item => item.displayName}
+                                        onChange={toggleOnChange('Camera')}
+                                    />
+                                </ProvideResource>
                             </FormFilter>
                         </Form.Group>
                         <Form.Group as={Col}>

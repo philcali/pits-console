@@ -4,46 +4,12 @@ import { Link } from "react-router-dom";
 import { pitsService } from "../../lib/services";
 import Header from "../common/Header";
 import { icons } from "../common/Icons";
+import ProvideResource from "../common/ProvideResource";
+import { useResource } from "../common/ResourceContext";
 import { useAlerts } from "../notifications/AlertContext";
 
 function TagTable(props) {
-    const alerts = useAlerts();
-    const [ resource, setResource ] = useState({
-        items: [],
-        nextToken: null,
-        loading: true
-    });
-
-    useEffect(() => {
-        let isMounted = true;
-        if (resource.loading) {
-            pitsService.tags().list({ nextToken: resource.nextToken })
-                .then(resp => {
-                    if (isMounted) {
-                        setResource({
-                            ...resource,
-                            items: resource.items.concat(resp.items),
-                            nextToken: resp.nextToken,
-                            loading: resp.nextToken !== null
-                        });
-                    }
-                })
-                .catch(e => {
-                    alerts.success(`Failed to load tags: ${e.message}`);
-                    if (isMounted) {
-                        setResource({
-                            ...resource,
-                            loading: false
-                        });
-                    }
-                });
-        }
-
-        return () => {
-            isMounted = false;
-        }
-    });
-
+    const resource = useResource();
     const associatedMap = {};
     props.associations.items.forEach(item => {
         associatedMap[item.id] = item;
@@ -150,7 +116,9 @@ function TagControl(props) {
     return (
         <>
             <Header as="h4">Associate Tags</Header>
-            <TagTable onToggle={onToggle} disabled={disabled || resource.loading} video={props.video} associations={resource}/>
+            <ProvideResource resource="tags">
+                <TagTable onToggle={onToggle} disabled={disabled || resource.loading} video={props.video} associations={resource}/>
+            </ProvideResource>
         </>
     );
 }
