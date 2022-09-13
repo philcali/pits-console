@@ -1,51 +1,16 @@
-import { useEffect, useState } from "react";
 import { Button, Card, Col, Container, Row, Spinner } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import MotionVideo from "../../components/cameras/MotionVideo";
 import AccountBreadcrumb from "../../components/common/AccountBreadcrumb";
 import Header from "../../components/common/Header";
 import { icons } from "../../components/common/Icons";
-import { useAlerts } from "../../components/notifications/AlertContext";
+import ProvideResource from "../../components/common/ProvideResource";
+import { useResource } from "../../components/common/ResourceContext";
 import { formatDate, formatTime } from "../../lib/format";
-import { pitsService } from "../../lib/services";
 
 function ResourceCard(props) {
-    const alerts = useAlerts();
-    const [ resource, setResource ] = useState({
-        total: 0,
-        nextToken: null,
-        loading: true
-    });
-
-    useEffect(() => {
-        let isMounted = true;
-        if (resource.loading) {
-            pitsService[props.resource]().list({ nextToken: resource.nextToken })
-                .then(resp => {
-                    if (isMounted) {
-                        setResource({
-                            ...resource,
-                            total: resp.items.length + resource.total,
-                            nextToken: resp.nextToken,
-                            loading: resp.nextToken !== null
-                        });
-                    }
-                })
-                .catch(e => {
-                    alerts.error(`Failed to load ${props.resource}: ${e.message}`);
-                    if (isMounted) {
-                        setResource({
-                            ...resource,
-                            total: 'NA',
-                            loading: false
-                        });
-                    }
-                });
-        }
-        return () => {
-            isMounted = false;
-        };
-    });
+    const resource = useResource();
+    const total = resource.items.length;
 
     return (
         <Card className="text-center mt-2">
@@ -53,50 +18,22 @@ function ResourceCard(props) {
             <Card.Body>
                 {resource.loading && <Spinner animation="border"/>}
                 {!resource.loading &&
-                    <h1><Link style={{ textDecoration: 'solid' }} className="link-success" to={`/account/${props.resource}`}>{resource.total}</Link></h1>
+                    <h1><Link style={{ textDecoration: 'solid' }} className="link-success" to={`/account/${resource.name}`}>{total}</Link></h1>
                 }
             </Card.Body>
         </Card>
     )   
 }
 
-function LatestCapturedVideoCard(props) {
-    const alerts = useAlerts();
-    const [ latestVideo, setLatestVideo ] = useState({
-        loading: true
-    });
-
-    useEffect(() => {
-        let isMounted = true;
-        if (latestVideo.loading) {
-            pitsService.videos().list({ limit: 1 })
-                .then(resp => {
-                    if (isMounted) {
-                        setLatestVideo({
-                            ...latestVideo,
-                            ...(resp.items[0] || {}),
-                            loading: false
-                        });
-                    }
-                })
-                .catch(e => {
-                    alerts.error(`Failed to load latest video: ${e.message}`);
-                    setLatestVideo({
-                        loading: false
-                    });
-                });
-        }
-        return () => {
-            isMounted = false;
-        };
-    });
-
+function LatestCapturedVideoCard() {
+    const resource = useResource();
+    const latestVideo = resource.items[0];
     return (
         <Card className="text-center">
             <Card.Header as="h4">Latest Motion Video</Card.Header>
             <Card.Body>
-                {latestVideo.loading && <Spinner animation="border"/>}
-                {(!latestVideo.loading && latestVideo.motionVideo) &&
+                {resource.loading && <Spinner animation="border"/>}
+                {(!resource.loading && latestVideo.motionVideo) &&
                     <>
                         <MotionVideo
                             motionVideo={latestVideo.motionVideo}
@@ -107,7 +44,7 @@ function LatestCapturedVideoCard(props) {
                 }
             </Card.Body>
             <Card.Footer>
-                <Button onClick={event => setLatestVideo({loading: true})} variant="outline-secondary">{icons.icon('arrow-clockwise')} Refresh</Button>
+                <Button onClick={event => resource.reload()} variant="outline-secondary">{icons.icon('arrow-clockwise')} Refresh</Button>
                 <Button className="ms-1" variant="outline-success" as={Link} to="/account/videos">All Videos</Button>
             </Card.Footer>
         </Card>
@@ -124,17 +61,18 @@ function ManageAccount() {
                     {["Groups", "Cameras", "Subscriptions", "Tags"].map(resource => {
                         return (
                             <Col key={`resource-${resource}`}>
-                                <ResourceCard
-                                    title={resource}
-                                    resource={resource.toLowerCase()}
-                                />
+                                <ProvideResource resource={resource.toLowerCase()}>
+                                    <ResourceCard title={resource}/>
+                                </ProvideResource>
                             </Col>
                         );
                     })}
                 </Row>
                 <Row className="mt-3" xs={1} lg={2} md={1}>
                     <Col>
-                        <LatestCapturedVideoCard/>
+                        <ProvideResource resource="videos" manuallyPage={true}>
+                            <LatestCapturedVideoCard/>
+                        </ProvideResource>
                     </Col>
                 </Row>
             </Container>
