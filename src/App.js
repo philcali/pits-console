@@ -22,6 +22,7 @@ import SubscriptionMutate from './pages/account/subscriptions/SubscriptionMutate
 import ManageAccount from './pages/account/ManageAccount';
 import Tags from './pages/account/tags/Tags';
 import TagMutate from './pages/account/tags/TagMutate';
+import Stats from './pages/account/stats/Stats';
 
 function App() {
   return (
@@ -46,6 +47,7 @@ function App() {
               <Route path="/account/subscriptions/:id" element={<PrivateRoute><SubscriptionMutate/></PrivateRoute>}/>
               <Route path="/account/tags" element={<PrivateRoute><Tags/></PrivateRoute>}/>
               <Route path="/account/tags/:tagId" element={<PrivateRoute><TagMutate/></PrivateRoute>}/>
+              <Route path="/account/stats" element={<PrivateRoute><Stats/></PrivateRoute>}/>
               <Route path="/login" element={<Login/>}/>
               <Route path="/logout" element={<Logout/>}/>
             </Routes>

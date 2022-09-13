@@ -184,6 +184,30 @@ class Icons {
                         <path d="M2 1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 1 6.586V2a1 1 0 0 1 1-1zm0 5.586 7 7L13.586 9l-7-7H2v4.586z"/>
                     </svg>
                 )
+            },
+            'camera-video' : ratio => {
+                let r = ratio || 16;
+                return (
+                    <svg xmlns="http://www.w3.org/2000/svg" width={r} height={r} fill="currentColor" className="bi bi-camera-video" viewBox="0 0 16 16">
+                        <path fillRule="evenodd" d="M0 5a2 2 0 0 1 2-2h7.5a2 2 0 0 1 1.983 1.738l3.11-1.382A1 1 0 0 1 16 4.269v7.462a1 1 0 0 1-1.406.913l-3.111-1.382A2 2 0 0 1 9.5 13H2a2 2 0 0 1-2-2V5zm11.5 5.175 3.5 1.556V4.269l-3.5 1.556v4.35zM2 4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h7.5a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H2z"/>
+                    </svg>
+                );
+            },
+            'camera-video-off' : ratio => {
+                let r = ratio || 16;
+                return (
+                    <svg xmlns="http://www.w3.org/2000/svg" width={r} height={r} fill="currentColor" className="bi bi-camera-video-off" viewBox="0 0 16 16">
+                        <path fillRule="evenodd" d="M10.961 12.365a1.99 1.99 0 0 0 .522-1.103l3.11 1.382A1 1 0 0 0 16 11.731V4.269a1 1 0 0 0-1.406-.913l-3.111 1.382A2 2 0 0 0 9.5 3H4.272l.714 1H9.5a1 1 0 0 1 1 1v6a1 1 0 0 1-.144.518l.605.847zM1.428 4.18A.999.999 0 0 0 1 5v6a1 1 0 0 0 1 1h5.014l.714 1H2a2 2 0 0 1-2-2V5c0-.675.334-1.272.847-1.634l.58.814zM15 11.73l-3.5-1.555v-4.35L15 4.269v7.462zm-4.407 3.56-10-14 .814-.58 10 14-.814.58z"/>
+                    </svg>
+                );
+            },
+            'activity' : ratio => {
+                let r = ratio || 16;
+                return (
+                    <svg xmlns="http://www.w3.org/2000/svg" width={r} height={r} fill="currentColor" className="bi bi-activity" viewBox="0 0 16 16">
+                        <path fillRule="evenodd" d="M6 2a.5.5 0 0 1 .47.33L10 12.036l1.53-4.208A.5.5 0 0 1 12 7.5h3.5a.5.5 0 0 1 0 1h-3.15l-1.88 5.17a.5.5 0 0 1-.94 0L6 3.964 4.47 8.171A.5.5 0 0 1 4 8.5H.5a.5.5 0 0 1 0-1h3.15l1.88-5.17A.5.5 0 0 1 6 2Z"/>
+                    </svg>
+                );
             }
         };
     }

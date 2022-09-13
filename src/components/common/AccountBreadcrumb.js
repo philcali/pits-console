@@ -30,6 +30,8 @@ function AccountBreadcrumb(props) {
             element.text = 'Configuration';
         } else if (part === 'tags') {
             element.text = 'Tags';
+        } else if (part === 'stats') {
+            element.text = 'Health Metrics';
         } else {
             element.text = part;
         }
