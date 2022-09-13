@@ -247,7 +247,7 @@ function ResourceList(props) {
                 <Table responsive hover>
                     <thead>
                         <tr>
-                            {columns.map(column => <th key={`column-${column.label}`}>{column.label}</th>)}
+                            {columns.map(column => <th className={column.centered ? 'text-center' : ''} key={`column-${column.label}`}>{column.label}</th>)}
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -256,11 +256,11 @@ function ResourceList(props) {
                             let editLink = props.formatEdit ? props.formatEdit(item) : `/account/${props.resource}/${item[props.resourceId]}`;
                             return (
                                 <tr key={`item-${index}`}>
-                                    {columns.map(column => <td key={`item-${index}-${column.label}`}>{column.format(item)}</td>)}
+                                    {columns.map(column => <td className={column.centered ? 'text-center' : ''} key={`item-${index}-${column.label}`}>{column.format(item)}</td>)}
                                     <td>
-                                        <Button size="sm" className="me-1" as={Link} to={editLink} variant="secondary">{icons.icon('pencil')}</Button>
+                                        {!props.disableMutate && <Button size="sm" className="me-1" as={Link} to={editLink} variant="secondary">{icons.icon('pencil')}</Button>}
                                         {(props.actions || []).map(action => <Button size="sm" className="me-1" variant="secondary" onClick={action.onClick(item)} key={`item-${index}-${action.icon}`}>{icons.icon(action.icon)}</Button>)}
-                                        <Button size="sm" onClick={handleDeleteModal(item)} variant="danger">{icons.icon('trash')}</Button>
+                                        {!props.disableMutate && <Button size="sm" onClick={handleDeleteModal(item)} variant="danger">{icons.icon('trash')}</Button>}
                                     </td>
                                 </tr>
                             )
