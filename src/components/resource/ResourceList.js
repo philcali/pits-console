@@ -83,6 +83,7 @@ function ResourceList(props) {
         ...props.columns,
         {
             label: 'Created At',
+            centered: true,
             format: (item) => props.formatTimestamp
                 ? props.formatTimestamp(item.createTime)
                 : formatDate(item.createTime)
@@ -104,6 +105,16 @@ function ResourceList(props) {
             ...content,
             loading: true,
         })
+    };
+
+    // TODO: use the Resource provider around the table element
+    const reload = () => {
+        setContent({
+            ...content,
+            nextToken: null,
+            items: [],
+            loading: true
+        });
     };
 
     const handleModalClose = () => {
@@ -259,7 +270,7 @@ function ResourceList(props) {
                                     {columns.map(column => <td className={column.centered ? 'text-center' : ''} key={`item-${index}-${column.label}`}>{column.format(item)}</td>)}
                                     <td>
                                         {!props.disableMutate && <Button size="sm" className="me-1" as={Link} to={editLink} variant="secondary">{icons.icon('pencil')}</Button>}
-                                        {(props.actions || []).map(action => <Button size="sm" className="me-1" variant="secondary" onClick={action.onClick(item)} key={`item-${index}-${action.icon}`}>{icons.icon(action.icon)}</Button>)}
+                                        {(props.actions || []).map(action => <Button size="sm" className="me-1" variant="secondary" onClick={action.onClick(item, reload)} key={`item-${index}-${action.icon}`}>{icons.icon(action.icon)}</Button>)}
                                         {!props.disableMutate && <Button size="sm" onClick={handleDeleteModal(item)} variant="danger">{icons.icon('trash')}</Button>}
                                     </td>
                                 </tr>
