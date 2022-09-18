@@ -66,7 +66,7 @@ function LatestHealthTable({ cameras }) {
             <thead>
                 <tr>
                     <th>Camera</th>
-                    <th>Last Check</th>
+                    <th className="text-center">Last Check</th>
                     <th className="text-center">Health</th>
                     <th className="text-center">Recording</th>
                 </tr>
@@ -84,7 +84,7 @@ function LatestHealthTable({ cameras }) {
                             return (
                                 <tr key={`stat-${stat.thing_name}-${stat.timestamp}`}>
                                     <td><Link to={`/account/cameras/${stat.thing_name}`}>{displayNameMap[stat.thing_name]}</Link></td>
-                                    <td>{formatDate(stat.timestamp)} {formatTime(stat.timestamp)}</td>
+                                    <td className="text-center">{formatDate(stat.timestamp)} {formatTime(stat.timestamp)}</td>
                                     <td className={`text-center text-${isDown ? 'danger' : 'success'}`}>{icons.icon(isDown ? 'dash-circle' : 'check-circle')}</td>
                                     <td className={`text-center text-${stat.recording_status ? 'success' : 'danger'}`}>{icons.icon(stat.recording_status ? 'camera-video' : 'camera-video-off')}</td>
                                 </tr>
@@ -105,7 +105,7 @@ function LatestDeviceHealth() {
             <Card.Body>
                 {resource.loading && <Spinner animation="border"/>}
                 {!resource.loading &&
-                    <ProvideResource additionalParams={{ thingName: resource.items.map(item => item.id) }} resource="stats">
+                    <ProvideResource additionalParams={{ thingName: resource.items.map(item => item.thingName) }} resource="stats">
                         <LatestHealthTable cameras={resource.items}/>
                     </ProvideResource>
                 }
