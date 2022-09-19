@@ -4,8 +4,8 @@ import { Link } from "react-router-dom";
 import { pitsService } from "../../lib/services";
 import Header from "../common/Header";
 import { icons } from "../common/Icons";
-import ProvideResource from "../common/ProvideResource";
-import { useResource } from "../common/ResourceContext";
+import ProvideResource from "../resource/ProvideResource";
+import { useResource } from "../resource/ResourceContext";
 import { useAlerts } from "../notifications/AlertContext";
 
 function TagTable(props) {

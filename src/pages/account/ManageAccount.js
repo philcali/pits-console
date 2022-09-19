@@ -4,8 +4,8 @@ import MotionVideo from "../../components/cameras/MotionVideo";
 import AccountBreadcrumb from "../../components/common/AccountBreadcrumb";
 import Header from "../../components/common/Header";
 import { icons } from "../../components/common/Icons";
-import ProvideResource from "../../components/common/ProvideResource";
-import { useResource } from "../../components/common/ResourceContext";
+import ProvideResource from "../../components/resource/ProvideResource";
+import { useResource } from "../../components/resource/ResourceContext";
 import { formatDate, formatTime } from "../../lib/format";
 
 function ResourceCard(props) {
