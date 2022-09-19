@@ -1,22 +1,26 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AccountBreadcrumb from "../../../components/common/AccountBreadcrumb";
 import { icons } from "../../../components/common/Icons";
-import ProvideResource from "../../../components/common/ProvideResource";
-import { useResource } from "../../../components/common/ResourceContext";
+import ProvideResource from "../../../components/resource/ProvideResource";
+import { useResource } from "../../../components/resource/ResourceContext";
+import { useAlerts } from "../../../components/notifications/AlertContext";
 import ResourceList from "../../../components/resource/ResourceList";
 import { formatDate, formatTime } from "../../../lib/format";
+import { pitsService } from "../../../lib/services";
 
-function StatsTable() {
-    const resource = useResource();
-    const displayNameMap = {};
-    resource.items.forEach(item => {
-        displayNameMap[item.thingName] = item.displayName;
-    });
-    const columns = [
+const TIMEOUT = 5000;
+const INTERVAL_TIME = 1000;
+
+const unixTimestamp = () => {
+    return Math.floor(Date.now() / 1000);
+};
+
+export const statsColums = (getDisplayName) => {
+    return [
         {
             label: 'Camera',
             format: item => {
-                return <Link to={`/account/cameras/${item.thing_name}/configuration`}>{displayNameMap[item.thing_name]}</Link>;
+                return <Link to={`/account/cameras/${item.thing_name}/configuration`}>{getDisplayName(item)}</Link>;
             }
         },
         {
@@ -24,6 +28,13 @@ function StatsTable() {
             centered: true,
             format: item => {
                 return item.version
+            }
+        },
+        {
+            label: 'IP',
+            centered: true,
+            format: item => {
+                return item.ip_addr
             }
         },
         {
@@ -42,7 +53,7 @@ function StatsTable() {
             }
         },
         {
-            label: 'Mem Usage',
+            label: 'Mem Avail',
             centered: true,
             format: item => {
                 return Math.floor((item.mem_avail / item.mem_total) * 100) + '%';
@@ -56,24 +67,59 @@ function StatsTable() {
             }
         }
     ];
+};
 
+function StatsTable() {
+    const resource = useResource();
+    const alerts = useAlerts();
+    const navigate = useNavigate();
+    const displayNameMap = {};
+    resource.items.forEach(item => {
+        displayNameMap[item.thingName] = item.displayName;
+    });
+
+    const columns = statsColums(item => displayNameMap[item.thing_name]);
     const actions = [
         {
             icon: 'activity',
             onClick: item => {
                 return () => {
-                    // TODO: fix this in the API
-                    // unconventional subresource list
-                    // navigate(`/account/stats/${item.thing_name}`);
+                    navigate(`/account/stats/${item.thing_name}`);
                 }
             }
         },
         {
             icon: 'arrow-clockwise',
-            onClick: item => {
+            onClick: (item, reload) => {
                 return () => {
-                    // TODO: fix this in the API
-                    // unconventional create
+                    pitsService.cameras()
+                        .resource(item.thing_name, 'stats')
+                        .create({})
+                        .then(resp => {
+                            alerts.success(`Forced a health signal to ${displayNameMap[item.thing_name]}.`);
+                            let max = unixTimestamp() + TIMEOUT;
+                            let timeout = setInterval(() => {
+                                let now = unixTimestamp()
+                                if (now - max >= TIMEOUT) {
+                                    alerts.error(`Failed to update health for ${displayNameMap[item.thing_name]} in time.`);
+                                    clearTimeout(timeout);
+                                } else {
+                                    pitsService.stats().list({ thingName: [ item.thing_name ] })
+                                        .then(lsresp => {
+                                            if (lsresp.items[0].createTime > item.createTime) {
+                                                clearInterval(timeout);
+                                                reload();
+                                            }
+                                        })
+                                        .catch(e => {
+                                            clearInterval(timeout);
+                                        });
+                                }
+                            }, INTERVAL_TIME);
+                        })
+                        .catch(e => {
+                            alerts.error(`Failed to post to ${displayNameMap[item.thing_name]}: ${e.message}`);
+                        });
                 }
             }
         }

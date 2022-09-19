@@ -3,8 +3,9 @@ import { pitsService } from "../../lib/services";
 import { useAlerts } from "../notifications/AlertContext";
 import { ResourceContext } from "./ResourceContext";
 
-function useResource(resource, additionalParams, manuallyPage) {
+function useResource(res, additionalParams, manuallyPage) {
     const alerts = useAlerts();
+    const [ resource, setResource ] = useState(res);
     const [ content, setContent ] = useState({
         items: [],
         loading: true,
@@ -12,9 +13,9 @@ function useResource(resource, additionalParams, manuallyPage) {
         nextToken: null
     });
 
-    let api = resource;
-    if (typeof resource === 'string') {
-        api = pitsService[resource]();
+    let api = resource || res;
+    if (typeof api === 'string') {
+        api = pitsService[api]();
     }
 
     if (content.loading) {
@@ -24,11 +25,15 @@ function useResource(resource, additionalParams, manuallyPage) {
         };
         api.list(params)
             .then(resp => {
+                let loading = 'nextToken' in resp && resp.nextToken !== null;
+                if (loading && manuallyPage === true) {
+                    loading = false;
+                }
                 setContent({
                     ...content,
                     items: content.items.concat(resp.items),
                     nextToken: resp.nextToken,
-                    loading: manuallyPage === false && typeof resp.nextToken === 'string'
+                    loading
                 });
             })
             .catch(e => {
@@ -40,20 +45,29 @@ function useResource(resource, additionalParams, manuallyPage) {
             });
     }
 
-    const reload = () => {
+    const reload = (newParams) => {
         setContent({
             items: [],
             loading: true,
             nextToken: null,
-            additionalParams
+            additionalParams: newParams || content.additionalParams
         });
-    }
+    };
+
+    const nextPage = () => {
+        setContent({
+            ...content,
+            loading: true,
+        })
+    };
 
     return {
         ...content,
         api,
         name: api.name,
-        reload
+        nextPage,
+        reload,
+        setResource
     };
 }
 

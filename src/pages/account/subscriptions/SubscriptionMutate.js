@@ -5,9 +5,9 @@ import { useAuth } from "../../../components/auth/AuthContext";
 import AccountBreadcrumb from "../../../components/common/AccountBreadcrumb";
 import CancelButton from "../../../components/common/CancelButton";
 import Header from "../../../components/common/Header";
-import ProvideResource from "../../../components/common/ProvideResource";
-import { useResource } from "../../../components/common/ResourceContext";
 import { useAlerts } from "../../../components/notifications/AlertContext";
+import ProvideResource from "../../../components/resource/ProvideResource";
+import { useResource } from "../../../components/resource/ResourceContext";
 import { pitsService } from "../../../lib/services";
 
 function FormFilter(props) {

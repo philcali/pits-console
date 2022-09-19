@@ -2,8 +2,8 @@ import { Col, Container, Row, Spinner } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import CameraCard from "../components/cameras/CameraCard";
 import Header from "../components/common/Header";
-import ProvideResource from "../components/common/ProvideResource";
-import { useResource } from "../components/common/ResourceContext";
+import ProvideResource from "../components/resource/ProvideResource";
+import { useResource } from "../components/resource/ResourceContext";
 
 function Groups() {
     const resource = useResource();
@@ -48,7 +48,7 @@ function Cameras() {
                 <>
                     {resource.items.map(camera => {
                         return (
-                            <Col className="text-center" key={`camera-${camera.thingName}`}>
+                            <Col className="text-center mt-2" key={`camera-${camera.thingName}`}>
                                 <CameraCard thingName={camera.thingName} displayName={camera.displayName}/>
                             </Col>
                         )
@@ -79,7 +79,7 @@ function GroupCameras({ group }) {
                     }
                     {!isEmpty &&
                         <ProvideResource additionalParams={{ thingName: resource.items.map(item => item.id) }} resource="cameras">
-                            <Row>
+                            <Row xs={1} md={1} lg={3}>
                                 <Cameras/>
                             </Row>
                         </ProvideResource>

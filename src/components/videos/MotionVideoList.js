@@ -176,8 +176,8 @@ function MotionVideoList(props) {
                     disabled={disabled}
                 />
             },
-            'resource': (resource, value) => {
-                return value === '' ? resource : pitsService.cameras().resource(value, 'videos');
+            'resource': (value) => {
+                return value === '' ? false : pitsService.cameras().resource(value, 'videos');
             },
             'disabledIfSet': 'tagId',
             'hideIfSet': ['cameraId', 'tagId']
@@ -197,8 +197,8 @@ function MotionVideoList(props) {
                     disabled={disabled}
                 />
             },
-            'resource': (resource, value) => {
-                return value === '' ? resource : pitsService.tags().resource(value, 'videos');
+            'resource': (value) => {
+                return value === '' ? false : pitsService.tags().resource(value, 'videos');
             },
             'disabledIfSet': 'cameraId',
             'hideIfSet': ['cameraId', 'tagId']
