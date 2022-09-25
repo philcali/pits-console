@@ -19,7 +19,7 @@ import ProvideResource from "./ProvideResource";
 import { useResource } from "./ResourceContext";
 import ResourcePagination from "./ResourcePagination";
 
-function ResourceTable(props) {
+export function ResourceTable(props) {
     const alerts = useAlerts();
     const canCreate = props.create === true || typeof(props.create) === 'undefined';
     const resource = useResource();
@@ -53,7 +53,7 @@ function ResourceTable(props) {
     if (resource.loading) {
         footerLabel = <Spinner animation="border"/>;
     } else if (isEmpty) {
-        footerLabel = `No ${resource.name} found.`;
+        footerLabel = `No ${props.resourceTitle}s found.`;
     } else if (canCreate) {
         footerLabel = <Button as={Link} to={`/account/${resource.name}/new`} variant="success">{icons.icon('plus')} New {props.resourceTitle}</Button>;
     }

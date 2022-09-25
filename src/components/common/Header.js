@@ -5,7 +5,7 @@ function Header({ children, as }) {
         React.createElement(
             as || 'h2',
             {
-                className: "pb-2 mb-3",
+                className: "mt-1 pb-2 mb-3",
                 style: { borderBottom: '1px solid #dddd' }
             },
             children
