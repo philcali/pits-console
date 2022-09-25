@@ -49,13 +49,15 @@ function SearchResource(props) {
 }
 
 function MotionVideoList(props) {
+    let resource = 'videos';
     let additionalParams = {};
-    if (props.cameraId) {
-        additionalParams['cameraId'] = props.cameraId;
-    }
-    if (props.tagId) {
-        additionalParams['tagId'] = props.tagId;
-    }
+    ['cameras', 'tags'].forEach(name => {
+        let id = name.substring(0, name.length - 1) + 'Id';
+        if (id in props) {
+            resource = pitsService[name]().resource(props[id], resource);
+            additionalParams[id] = props[id];
+        }
+    });
     const [ modal, setModal ] = useState({
         visible: false,
         associateVisible: false,
@@ -236,7 +238,7 @@ function MotionVideoList(props) {
                 </Modal.Footer>
             </Modal>
             <ResourceList
-                resource="videos"
+                resource={resource}
                 resourceTitle="Motion Video"
                 resourceId="motionVideo"
                 searchParams={searchParams}

@@ -13,8 +13,14 @@ import { pitsService } from "../../../lib/services";
 function FormFilter(props) {
     return (
         <>
-            <Form.Check name={props.name} onChange={props.onChange} checked={props.name in props.filters} type="switch" label={props.label}/>
-            <br/>
+            <Form.Check
+                className="mb-2"
+                id={props.name}
+                name={props.name}
+                onChange={props.onChange}
+                checked={props.name in props.filters}
+                type="switch"
+                label={props.label}/>
             {props.name in props.filters && <>{props.children}</>}
         </>
     );
@@ -160,8 +166,9 @@ function SubscriptionMutate() {
         setFormData(newFormData);
     };
 
-    const handleWeekdayRange = (element) => {
+    const handleWeekdayRange = (id, element) => {
         return {
+            id,
             checked: formData.filter['DayOfWeek'] && formData.filter['DayOfWeek'].filter(item => item.numeric && item.numeric.join() === element.numeric.join()).length === 1,
             onChange: event => {
                 let days = formData.filter['DayOfWeek'];
@@ -175,6 +182,28 @@ function SubscriptionMutate() {
                     filter: {
                         ...formData.filter,
                         'DayOfWeek': days
+                    }
+                });
+            }
+        }
+    };
+
+    const handleAlertType = (type) => {
+        return {
+            id: `by-${type.toLowerCase()}`,
+            checked: formData.filter['AlertType'] && formData.filter['AlertType'].indexOf(type) !== -1,
+            onChange: event => {
+                let types = formData.filter['AlertType'];
+                if (event.target.checked) {
+                    types.push(type);
+                } else {
+                    types = types.filter(t => t !== type);
+                }
+                setFormData({
+                    ...formData,
+                    filter: {
+                        ...formData.filter,
+                        'AlertType': types
                     }
                 });
             }
@@ -242,7 +271,21 @@ function SubscriptionMutate() {
                     <h3>
                         Filters
                     </h3>
-                    <Row className="mb-3">
+                    <Row className="mb-3" xs={1} md={3}>
+                        <Form.Group as={Col}>
+                            <FormFilter name="AlertType" filters={formData.filter} onChange={handleFilterToggle} label="Filter by Alert">
+                                {["HEALTH", "MOTION"].map(name => {
+                                    return (
+                                        <Form.Check
+                                            {...handleAlertType(name)}
+                                            key={name}
+                                            type="switch"
+                                            label={`By ${name.toLocaleLowerCase()}`}
+                                        />
+                                    );
+                                })}
+                            </FormFilter>
+                        </Form.Group>
                         <Form.Group as={Col}>
                             <FormFilter name="Group" filters={formData.filter} onChange={handleFilterToggle} label="Filter by Groups">
                                 <ProvideResource resource="groups">
@@ -267,10 +310,12 @@ function SubscriptionMutate() {
                                 </ProvideResource>
                             </FormFilter>
                         </Form.Group>
+                    </Row>
+                    <Row className="mb-3" xs={1} md={2}>
                         <Form.Group as={Col}>
                             <FormFilter name="DayOfWeek" filters={formData.filter} onChange={handleFilterToggle} label="Filter by Day">
-                                <Form.Check {...handleWeekdayRange({'numeric': ['>=', 1, '<=', 5]})} type="switch" label="Weekdays"/>
-                                <Form.Check {...handleWeekdayRange({'numeric': ['>=', 6, '<=', 7]})} type="switch" label="Weekends"/>
+                                <Form.Check {...handleWeekdayRange('day-weekday',{'numeric': ['>=', 1, '<=', 5]})} type="switch" label="Weekdays"/>
+                                <Form.Check {...handleWeekdayRange('day-weekend', {'numeric': ['>=', 6, '<=', 7]})} type="switch" label="Weekends"/>
                                 <ToggleButtonGroup className="mt-2" value={formData.filter['DayOfWeek']} onChange={toggleOnChange('DayOfWeek')} type="checkbox" vertical>
                                     {['1: Mon', '2: Tues', '3: Wed', '4: Thu', '5: Fri', '6: Sat', '7: Sun']
                                         .filter(day => (formData.filter['DayOfWeek'] || [])
@@ -293,7 +338,7 @@ function SubscriptionMutate() {
                         </Form.Group>
                         <Form.Group as={Col}>
                             <FormFilter name="Hour" onChange={handleFilterToggle} filters={formData.filter} label="Filter by Hour">
-                                <Form.Check checked={isCustomRange()} onChange={toggleCustomRange} type="switch" label="Custom Range"/>
+                                <Form.Check id="custom-range" checked={isCustomRange()} onChange={toggleCustomRange} type="switch" label="Custom Range"/>
                                 {isCustomRange() &&
                                     <InputGroup className="mt-2">
                                         <InputGroup.Text>{'>='}</InputGroup.Text>
