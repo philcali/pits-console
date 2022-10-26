@@ -24,6 +24,8 @@ import Tags from './pages/account/tags/Tags';
 import TagMutate from './pages/account/tags/TagMutate';
 import Stats from './pages/account/stats/Stats';
 import HealthHistory from './pages/account/stats/HealthHistory';
+import Jobs from './pages/account/jobs/Jobs';
+import JobMutate from './pages/account/jobs/JobMutate';
 
 function App() {
   return (
@@ -50,6 +52,8 @@ function App() {
               <Route path="/account/tags/:tagId" element={<PrivateRoute><TagMutate/></PrivateRoute>}/>
               <Route path="/account/stats" element={<PrivateRoute><Stats/></PrivateRoute>}/>
               <Route path="/account/stats/:thingName" element={<PrivateRoute><HealthHistory/></PrivateRoute>}/>
+              <Route path="/account/jobs" element={<PrivateRoute><Jobs/></PrivateRoute>}/>
+              <Route path="/account/jobs/:jobId" element={<PrivateRoute><JobMutate/></PrivateRoute>}/>
               <Route path="/login" element={<Login/>}/>
               <Route path="/logout" element={<Logout/>}/>
             </Routes>

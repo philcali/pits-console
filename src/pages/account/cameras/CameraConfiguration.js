@@ -230,8 +230,8 @@ function CameraConfiguration() {
                     </Row>
                 </Form>
                 <hr/>
-                <MotionVideoList cameraId={cameraId}/>
             </Container>
+            <MotionVideoList cameraId={cameraId}/>
         </>
     );
 }

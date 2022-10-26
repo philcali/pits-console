@@ -3,6 +3,7 @@ import { Button, Container, Form } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import AccountBreadcrumb from "../../../components/common/AccountBreadcrumb";
 import CancelButton from "../../../components/common/CancelButton";
+import Header from "../../../components/common/Header";
 import { useAlerts } from "../../../components/notifications/AlertContext";
 import AssociateControl from "../../../components/resource/AssociateControl";
 import { pitsService } from "../../../lib/services";
@@ -106,9 +107,9 @@ function CreateGroup() {
         <>
             <AccountBreadcrumb/>
             <Container>
-                <h2 className="pt-3 pb-2 mb-3" style={{ borderBottom: '1px solid #ddd' }}>
+                <Header>
                     {create ? 'Create Group' : `Update ${formData.name}`}
-                </h2>
+                </Header>
 
                 <Form noValidate validated={data.validated} onSubmit={handleSubmit}>
                     <Form.Group className="mb-3" controlId="name">

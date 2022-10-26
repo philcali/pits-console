@@ -37,7 +37,7 @@ function LatestCapturedVideoCard({ cameras }) {
             <Card.Header as="h4">Latest Motion Video</Card.Header>
             <Card.Body>
                 {resource.loading && <Spinner animation="border"/>}
-                {(!resource.loading && latestVideo.motionVideo) &&
+                {(!resource.loading && latestVideo && latestVideo.motionVideo) &&
                     <>
                         <MotionVideo
                             motionVideo={latestVideo.motionVideo}
@@ -45,6 +45,11 @@ function LatestCapturedVideoCard({ cameras }) {
                         <br/>
                         <small>Captured by <Link to={`/account/cameras/${latestVideo.thingName}/configuration`}>{displayNameMap[latestVideo.thingName]}</Link> on <strong>{formatDate(latestVideo.createTime)} {formatTime(latestVideo.createTime)}</strong></small>
                     </>
+                }
+                {(!resource.loading && !latestVideo) &&
+                    <p>
+                        No motion videos recorded yet.
+                    </p>
                 }
             </Card.Body>
             <Card.Footer>
@@ -77,7 +82,12 @@ function LatestHealthTable({ cameras }) {
                         <td className="text-center" colSpan={4}><Spinner animation="border"/></td>
                     </tr>
                 }
-                {!resource.loading &&
+                {(!resource.loading && resource.items.length === 0) &&
+                    <tr>
+                        <td className="text-center" colSpan={4}>No health record found.</td>
+                    </tr>
+                }
+                {(!resource.loading && resource.items.length > 0) &&
                     <>
                         {resource.items.map(stat => {
                             const isDown = stat.status === 'UNHEALTHY';

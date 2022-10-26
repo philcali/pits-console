@@ -70,9 +70,8 @@ function GroupCameras({ group }) {
                     {isEmpty &&
                         <Row>
                             <Col>
-                                <p>Looks like there are no associated
-                                    <Link to="/account/cameras">Cameras</Link> for
-                                    <Link to={`/account/groups/${group.name}`}>{group.name}</Link>.
+                                <p>
+                                    Looks like there are no associated <Link to="/account/cameras">Cameras</Link> for <Link to={`/account/groups/${group.name}`}>{group.name}</Link>.
                                 </p>
                             </Col>
                         </Row>

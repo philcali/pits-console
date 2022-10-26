@@ -4,6 +4,7 @@ import { icons } from "../common/Icons";
 import { pitsService } from "../../lib/services";
 import { useAlerts } from "../notifications/AlertContext";
 import logo from "../../logo2.png";
+import CameraHealthBadge from "./CameraHealthBadge";
 
 function CameraCard(props) {
     const alerts = useAlerts();
@@ -74,6 +75,7 @@ function CameraCard(props) {
         <Card bg={variant} text={variant === 'light' ? 'dark' : 'white'}>
             <Card.Header {...cardHeader}>
                 <strong className="ms-6">{props.displayName || props.thingName}</strong>
+                <CameraHealthBadge thingName={props.thingName} />
             </Card.Header>
             {!image.loading &&
             <Card.Img className="fluid" variant="top" src={image.url}/>
