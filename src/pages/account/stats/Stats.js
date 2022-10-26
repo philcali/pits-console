@@ -41,7 +41,7 @@ export const statsColums = (getDisplayName) => {
             label: 'Health',
             centered: true,
             format: item => {
-                const isDown = item.stats === 'UNHEALTHY'
+                const isDown = item.status === 'UNHEALTHY'
                 return <span className={isDown ? 'text-danger' : 'text-success'}>{icons.icon(isDown ? 'dash-circle' : 'check-circle')}</span>
             }
         },

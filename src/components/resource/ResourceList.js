@@ -43,8 +43,8 @@ export function ResourceTable(props) {
             label: 'Created At',
             centered: true,
             format: (item) => props.formatTimestamp
-                ? props.formatTimestamp(item.createTime)
-                : formatDate(item.createTime)
+                ? props.formatTimestamp(item[props.createTimeField || 'createTime'])
+                : formatDate(item[props.createTimeField || 'createTime'])
         }
     ];
 
@@ -110,7 +110,7 @@ export function ResourceTable(props) {
                     delete newParams[param.name];
                 } else if (newParams[param.name] === '') {
                     delete newParams[param.name];
-                } else if (param.type === 'date') {
+                } else if (param.type === 'date' || param.type === 'datetime-local') {
                     let date = new Date(newParams[param.name]);
                     newParams[param.name] = date.toISOString();
                 }
@@ -138,7 +138,7 @@ export function ResourceTable(props) {
 
     return (
         <>
-            <Modal show={modal.visible} onHide={handleModalClose}>
+            <Modal size="lg" show={modal.visible} onHide={handleModalClose}>
                 <Modal.Header closeButton>
                     <Modal.Title>Delete {props.formatResource ? props.formatResource(modal.item) : modal.item[props.resourceId]}</Modal.Title>
                 </Modal.Header>

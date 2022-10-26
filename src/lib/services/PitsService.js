@@ -37,6 +37,7 @@ class Resource extends BaseService {
             }
         }
         return this.request(`/${endpoint}`)
+            .then(this.throwOnError)
             .then(resp => resp.json());
     }
 
@@ -196,6 +197,7 @@ class PitsService extends BaseService {
     'videos',
     'subscriptions',
     'tags',
+    'jobs',
     'stats'
 ].forEach(resource => {
     PitsService.prototype[resource] = function name() {

@@ -60,6 +60,7 @@ function Navigation() {
                                     <NavDropdown.Divider/>
                                     <NavDropdown.Item {...setHrefAndActive('/account/groups')}>Groups</NavDropdown.Item>
                                     <NavDropdown.Item {...setHrefAndActive('/account/cameras')}>Cameras</NavDropdown.Item>
+                                    <NavDropdown.Item {...setHrefAndActive('/account/jobs')}>Jobs</NavDropdown.Item>
                                     <NavDropdown.Item {...setHrefAndActive('/account/videos')}>Motion Videos</NavDropdown.Item>
                                     <NavDropdown.Item {...setHrefAndActive('/account/tags')}>Tags</NavDropdown.Item>
                                     <NavDropdown.Item {...setHrefAndActive('/account/stats')}>Health Metrics</NavDropdown.Item>

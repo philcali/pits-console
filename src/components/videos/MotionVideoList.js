@@ -155,12 +155,12 @@ function MotionVideoList(props) {
         {
             'name': 'startTime',
             'label': 'After',
-            'type': 'date',
+            'type': 'datetime-local',
         },
         {
             'name': 'endTime',
             'label': 'Before',
-            'type': 'date'
+            'type': 'datetime-local'
         },
         {
             'name': 'cameraId',

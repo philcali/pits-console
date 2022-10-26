@@ -256,8 +256,8 @@ function CameraMutate() {
                     <Button disabled={data.submitting || !formData.thingName} type="submit" variant="success">{create ? 'Create' : 'Update'}</Button>
                 </Form>
                 <hr/>
-                {!create && <MotionVideoList cameraId={cameraId}/>}
             </Container>
+            {!create && <MotionVideoList cameraId={cameraId}/>}
         </>
     );
 }
