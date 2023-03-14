@@ -61,13 +61,16 @@ function useResource(res, additionalParams, manuallyPage) {
         })
     };
 
+    const deleteFun = itemId => api.delete(itemId);
+
     return {
         ...content,
         api,
         name: api.name,
         nextPage,
         reload,
-        setResource
+        setResource,
+        delete: deleteFun
     };
 }
 
