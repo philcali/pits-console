@@ -162,10 +162,10 @@ function JobMutate() {
             action
                 .then(resp => {
                     alerts.success(`Successfully ${create ? 'created' : 'updated'} ${resp.jobId}`);
-                    navigate(`/account/jobs/${resp.jobId}/executions`);
+                    navigate(`/account/jobs/${resp.jobId}`);
                 })
                 .catch(e => {
-
+                    alerts.error(`Failed to ${create ? 'create' : 'update'} job: ${e}`)
                 });
         }
     };

@@ -194,7 +194,7 @@ export function ResourceTable(props) {
                 onSelectedSlice={(start, end) => setCurrentSlice([start, end])}
             />
 
-            <Table responsive hover>
+            <Table responsive hover className="text-nowrap">
                 <thead>
                     <tr>
                         {columns.map(column => <th className={column.centered ? 'text-center' : ''} key={`column-${column.label}`}>{column.label}</th>)}
