@@ -31,6 +31,23 @@ export const statsColums = (getDisplayName) => {
             }
         },
         {
+            label: 'OS',
+            centered: true,
+            format: item => {
+                return [
+                    (item.os_id || 'NA'),
+                    (item.os_version || 'NA')
+                ].join(': ').replace('\n', '')
+            }
+        },
+        {
+            label: 'Python',
+            centered: true,
+            format: item => {
+                return item.python_version || 'NA'
+            }
+        },
+        {
             label: 'IP',
             centered: true,
             format: item => {
