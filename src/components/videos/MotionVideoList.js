@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Form, Modal } from "react-bootstrap";
+import { Button, Form, Modal, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { formatDate, formatDuration, formatTime } from "../../lib/format";
 import { pitsService } from "../../lib/services";
@@ -99,6 +99,33 @@ function MotionVideoList(props) {
             label: 'Camera',
             format: (item) => {
                 return <Link to={`/account/cameras/${item.thingName}/configuration`}>{thingDisplayName[item.thingName] || item.thingName}</Link>
+            }
+        },
+        {
+            label: 'Trigger',
+            centered: true,
+            format: item => {
+                let icon = icons.icon('person-walking', 20);
+                let source = 'motion'
+                if (item.trigger && item.trigger !== 'motion') {
+                    icon = icons.icon('person-standing');
+                    source = item.trigger;
+                }
+                const renderTooltip = props => {
+                    return (
+                        <Tooltip {...props} id={`${item.motionVideo}.trigger`}>
+                            Triggered by {source} action.
+                        </Tooltip>
+                    )   
+                }
+                return (
+                    <OverlayTrigger
+                        placement="right"
+                        overlay={renderTooltip}
+                    >
+                        <span>{icon}</span>
+                    </OverlayTrigger>
+                )
             }
         },
         {
