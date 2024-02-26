@@ -208,7 +208,33 @@ class Icons {
                         <path fillRule="evenodd" d="M6 2a.5.5 0 0 1 .47.33L10 12.036l1.53-4.208A.5.5 0 0 1 12 7.5h3.5a.5.5 0 0 1 0 1h-3.15l-1.88 5.17a.5.5 0 0 1-.94 0L6 3.964 4.47 8.171A.5.5 0 0 1 4 8.5H.5a.5.5 0 0 1 0-1h3.15l1.88-5.17A.5.5 0 0 1 6 2Z"/>
                     </svg>
                 );
-            }
+            },
+            'person-standing': ratio => {
+                let r = ratio || 16;
+                return (
+                    <svg xmlns="http://www.w3.org/2000/svg" width={r} height={r} fill="currentColor" className="bi bi-person-standing" viewBox="0 0 16 16">
+                        <path d="M8 3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3M6 6.75v8.5a.75.75 0 0 0 1.5 0V10.5a.5.5 0 0 1 1 0v4.75a.75.75 0 0 0 1.5 0v-8.5a.25.25 0 1 1 .5 0v2.5a.75.75 0 0 0 1.5 0V6.5a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v2.75a.75.75 0 0 0 1.5 0v-2.5a.25.25 0 0 1 .5 0"/>
+                    </svg>
+                );
+            },
+            'person-walking': ratio => {
+                let r = ratio || 16;
+                return (
+                    <svg xmlns="http://www.w3.org/2000/svg" width={r} height={r} fill="currentColor" className="bi bi-person-walking" viewBox="0 0 16 16">
+                        <path d="M9.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0M6.44 3.752A.75.75 0 0 1 7 3.5h1.445c.742 0 1.32.643 1.243 1.38l-.43 4.083a1.8 1.8 0 0 1-.088.395l-.318.906.213.242a.8.8 0 0 1 .114.175l2 4.25a.75.75 0 1 1-1.357.638l-1.956-4.154-1.68-1.921A.75.75 0 0 1 6 8.96l.138-2.613-.435.489-.464 2.786a.75.75 0 1 1-1.48-.246l.5-3a.75.75 0 0 1 .18-.375l2-2.25Z"/>
+                        <path d="M6.25 11.745v-1.418l1.204 1.375.261.524a.8.8 0 0 1-.12.231l-2.5 3.25a.75.75 0 1 1-1.19-.914zm4.22-4.215-.494-.494.205-1.843.006-.067 1.124 1.124h1.44a.75.75 0 0 1 0 1.5H11a.75.75 0 0 1-.531-.22Z"/>
+                    </svg>
+                )
+            },
+            'record-btn': ratio => {
+                let r = ratio || 16;
+                return (
+                    <svg xmlns="http://www.w3.org/2000/svg" width={r} height={r} fill="currentColor" className="bi bi-record-btn" viewBox="0 0 16 16">
+                        <path d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                        <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm15 0a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1z"/>
+                    </svg>
+                )
+            } 
         };
     }
 

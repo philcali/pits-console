@@ -13,6 +13,7 @@ function CameraCard(props) {
         lastModified: '',
         loading: true,
         startLoading: true,
+        startVideoCapture: false,
     });
 
     const updateCameraImage = event => {
@@ -35,6 +36,27 @@ function CameraCard(props) {
                 });
             })
     };
+
+    const startCaptureVideo = () => {
+        setImage({
+            ...image,
+            startVideoCapture: true
+        });
+        pitsService.startVideoCapture(props.thingName)
+            .then(resp => resp.json())
+            .then(capture => {
+                alerts.success(`Successfully sent event to capture video for ${props.displayName}`);
+            })
+            .catch(e => {
+                alerts.error(`Failed to send event to capture video for ${props.displayName}: ${e.message}`);
+            })
+            .finally(() => {
+                setImage({
+                    ...image,
+                    startVideoCapture: false,
+                })
+            });
+    }
 
     useEffect(() => {
         let isMounted = true;
@@ -88,6 +110,8 @@ function CameraCard(props) {
                         <strong>Last Modified</strong>: {image.lastModified ? new Date(image.lastModified).toLocaleString() : 'NA'}
                         <br/>
                         <Button className="mt-1" onClick={updateCameraImage} variant="success">{icons.icon('camera')} Refresh</Button>
+                        {' '}
+                        <Button disabled={image.startVideoCapture} className="mt-1" onClick={startCaptureVideo} variant="secondary">{image.startVideoCapture ? <Spinner size="sm" animation="border"/> : icons.icon('record-btn')} Record</Button>
                     </>
                     }
                 </Card.Text>

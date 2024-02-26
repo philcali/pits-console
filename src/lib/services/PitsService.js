@@ -176,6 +176,18 @@ class PitsService extends BaseService {
         .then(resp => resp.json());
     }
 
+    async startVideoCapture(thingName, durationInSeconds = 30) {
+        return this.request(`/cameras/${thingName}/captureVideo`, {
+            method: 'POST',
+            body: JSON.stringify({
+                "durationInSeconds": durationInSeconds
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+    }
+
     async getImageCaptureMetadata(thingName) {
         return this.request(`/cameras/${thingName}/captureImage`);
     }
