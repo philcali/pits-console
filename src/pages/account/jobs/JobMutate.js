@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Badge, Button, Container, Form, Modal, Table } from "react-bootstrap";
+import { Badge, Button, Col, Container, Form, Modal, Row, Table } from "react-bootstrap";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import AccountBreadcrumb from "../../../components/common/AccountBreadcrumb";
 import CancelButton from "../../../components/common/CancelButton";
@@ -12,7 +12,6 @@ import ResourceList from "../../../components/resource/ResourceList";
 import { formatDate, formatTime } from "../../../lib/format";
 import { pitsService } from "../../../lib/services";
 
-const JOB_TYPES = [ "Update", "Reboot" ]
 
 function TargetSelect({ resourceId, resourceLabel, onChange, name, value }) {
     const resource = useResource();
@@ -25,6 +24,60 @@ function TargetSelect({ resourceId, resourceLabel, onChange, name, value }) {
             })}
         </Form.Select>
     )
+}
+
+function JobTypeSelect(props) {
+    const alerts = useAlerts();
+    const [ types, setTypes ] = useState({
+        items: [],
+        loading: true,
+    });
+
+    useEffect(() => {
+        let isMounted = true;
+        if (types.loading) {
+            pitsService.jobTypes().list().then(resp => {
+                if (isMounted) {
+                    setTypes({
+                        ...types,
+                        items: resp.items,
+                        loading: false
+                    });
+                }
+            }).catch(e => {
+                alerts.error(`Failed to load job types: ${e.message}`);
+                if (isMounted) {
+                    setTypes({
+                        ...types,
+                        loading: false
+                    });
+                }
+            })
+        }
+        return () => {
+            isMounted = false;
+        }
+    })
+
+    return (
+        <Row>
+            <Col>
+                <Form.Select {...props}>
+                    {types.items.map(item => <option key={`type-${item.name}`} value={item.name}>{item.name}</option>)}
+                </Form.Select>
+            </Col>
+            {types.items.length > 0 &&
+                <Col>
+                    <Row>
+                        <Col><strong>Description:</strong> {types.items.find(item => item.name === props.value).description}</Col>
+                    </Row>
+                    <Row>
+                        <Col><strong>Parameters:</strong> {types.items.find(item => item.name === props.value).parameters.map(param => <Badge key={param} pill>{param}</Badge>)}</Col>
+                    </Row>
+                </Col>
+            }
+        </Row>
+    );
 }
 
 function JobExecutionTable({ jobId }) {
@@ -45,6 +98,12 @@ function JobExecutionTable({ jobId }) {
             label: 'Status',
             format: (item) => {
                 return <Badge bg={getStatusColor(item.status)}>{item.status}</Badge>
+            }
+        },
+        {
+            label: 'Execution Number',
+            format: item => {
+                return item.executionNumber;
             }
         },
         {
@@ -220,7 +279,7 @@ function JobMutate() {
                     <Form>
                         <Form.Group className="mb-3" controlId="type">
                             <Form.Label>Target Type</Form.Label>
-                            <Form.Select name="type" onChange={modalInputChange} value={modal.type}>
+                            <Form.Select disabled={modal.type !== ''} name="type" onChange={modalInputChange} value={modal.type}>
                                 <option>Select a Type</option>
                                 <option value="cameras">Camera</option>
                                 <option value="groups">Group</option>
@@ -230,6 +289,7 @@ function JobMutate() {
                             <ProvideResource resource={modal.type}>
                                 <TargetSelect
                                     resourceId={modal.type === 'cameras' ? 'thingName' : 'name'}
+                                    resourceLabel={modal.type === 'cameras' ? 'displayName' : undefined}
                                     value={modal.targetId}
                                     name="targetId"
                                     onChange={modalInputChange}
@@ -301,9 +361,7 @@ function JobMutate() {
                     }
                     <Form.Group className="mb-3" controlId="type">
                         <Form.Label>Type</Form.Label>
-                        <Form.Select disabled={disabled || !create} name="type" required onChange={inputChange} value={formData.type}>
-                            {JOB_TYPES.map((type, index) => <option key={`type-${index}`} value={type.toLowerCase()}>{type}</option>)}
-                        </Form.Select>
+                        <JobTypeSelect disabled={disabled || !create} name="type" required onChange={inputChange} value={formData.type}/>
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="description">
                         <Form.Label>Description</Form.Label>
