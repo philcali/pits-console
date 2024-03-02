@@ -9,16 +9,8 @@ class Resource extends BaseService {
         this.name = name;
     }
 
-    async throwOnError(response) {
-        if (response < 200 || response >= 300) {
-            let body = await response.json();
-            throw Error(body.message);
-        }
-        return response;
-    }
-
-    async list(params) {
-        let endpoint = this.name;
+    formatQueryParams(params) {
+        let postfix = '';
         if (params) {
             let query = [];
             for (let key in params) {
@@ -33,16 +25,30 @@ class Resource extends BaseService {
                 }
             }
             if (query.length > 0) {
-                endpoint += `?${query.join('&')}`;
+                postfix += `?${query.join('&')}`;
             }
         }
-        return this.request(`/${endpoint}`)
+        return postfix;
+    }
+
+    async throwOnError(response) {
+        if (response.status < 200 || response.status >= 300) {
+            let body = await response.json();
+            throw Error(body.message);
+        }
+        return response;
+    }
+
+    async list(params) {
+        return this.request(`/${this.name}${this.formatQueryParams(params)}`)
             .then(this.throwOnError)
             .then(resp => resp.json());
     }
 
-    async get(itemId) {
-        return this.request(`/${this.name}/${itemId}`)
+    async get(itemId, params={}) {
+        return this
+            .request(`/${this.name}/${itemId}${this.formatQueryParams(params)}`)
+            .then(this.throwOnError)
             .then(resp => resp.json());
     }
 

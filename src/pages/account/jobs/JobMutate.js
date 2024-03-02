@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Badge, Button, Col, Container, Form, Modal, Row, Table } from "react-bootstrap";
+import { Badge, Button, Col, Container, Form, Modal, Row, Spinner, Table } from "react-bootstrap";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import AccountBreadcrumb from "../../../components/common/AccountBreadcrumb";
 import CancelButton from "../../../components/common/CancelButton";
@@ -11,6 +11,7 @@ import { useResource } from "../../../components/resource/ResourceContext";
 import ResourceList from "../../../components/resource/ResourceList";
 import { formatDate, formatTime } from "../../../lib/format";
 import { pitsService } from "../../../lib/services";
+import { JobCancelationModal } from "./Jobs";
 
 
 function TargetSelect({ resourceId, resourceLabel, onChange, name, value }) {
@@ -27,66 +28,129 @@ function TargetSelect({ resourceId, resourceLabel, onChange, name, value }) {
 }
 
 function JobTypeSelect(props) {
-    const alerts = useAlerts();
-    const [ types, setTypes ] = useState({
-        items: [],
-        loading: true,
-    });
+    const resource = useResource();
+    const jobType = resource.items.find(item => item.name === props.value);
 
-    useEffect(() => {
-        let isMounted = true;
-        if (types.loading) {
-            pitsService.jobTypes().list().then(resp => {
-                if (isMounted) {
-                    setTypes({
-                        ...types,
-                        items: resp.items,
-                        loading: false
-                    });
-                }
-            }).catch(e => {
-                alerts.error(`Failed to load job types: ${e.message}`);
-                if (isMounted) {
-                    setTypes({
-                        ...types,
-                        loading: false
-                    });
-                }
-            })
-        }
-        return () => {
-            isMounted = false;
-        }
-    })
+    const onParameterChange = param => event => {
+        props.onParameterChange(param, event.target.value);
+    };
 
     return (
-        <Row>
-            <Col>
-                <Form.Select {...props}>
-                    {types.items.map(item => <option key={`type-${item.name}`} value={item.name}>{item.name}</option>)}
-                </Form.Select>
-            </Col>
-            {types.items.length > 0 &&
-                <Col>
-                    <Row>
-                        <Col><strong>Description:</strong> {types.items.find(item => item.name === props.value).description}</Col>
-                    </Row>
-                    <Row>
-                        <Col><strong>Parameters:</strong> {types.items.find(item => item.name === props.value).parameters.map(param => <Badge key={param} pill>{param}</Badge>)}</Col>
-                    </Row>
-                </Col>
-            }
-        </Row>
+        <>
+            <Form.Group className="mb-3" controlId="type">
+                <Form.Label>Type</Form.Label>
+                <Row>
+                    <Col>
+                        <Form.Select {...props} disabled={props.disabled || resource.loading}>
+                            {resource.items.map(item => <option key={`type-${item.name}`} value={item.name}>{item.name}</option>)}
+                        </Form.Select>
+                    </Col>
+                {jobType && 
+                    <Col>
+                        <strong>Description:</strong> {jobType.description}
+                        <br/>
+                        <strong>Version:</strong> {jobType.version}
+                    </Col>
+                }
+                </Row>
+            </Form.Group>
+            {(jobType?.parameters || []).map(param => {
+                return (
+                    <Form.Group className="mb-3" controlId={`parameters-${param}`}>
+                        <Form.Label>Parameter: <Badge pill>{param}</Badge></Form.Label>
+                        <Form.Control disabled={props.disabled} value={props.parameters[param] || ''} onChange={onParameterChange(param)} type="input"></Form.Control>
+                    </Form.Group>
+                );
+            })}
+        </>
     );
 }
 
 function JobExecutionTable({ jobId }) {
+    const alerts = useAlerts();
     const camera = useResource();
     const resource = pitsService.jobs().resource(jobId, 'executions');
     const thingDisplayName = {};
     camera.items.forEach(item => {
         thingDisplayName[item.thingName] = item.displayName
     });
+
+    const [ modal, setModal ] = useState({
+        detailsShow: false,
+        deleteShow: false,
+        cancelShow: false,
+        detailsLoading: false,
+        deleteLoading: false,
+        cancelLoading: false,
+        execution: {},
+    });
+
+    useEffect(() => {
+        if (modal.detailsLoading) {
+            pitsService.jobs()
+                .resource(jobId, 'executions')
+                .get(modal.execution.thingName, { executionId: modal.execution.executionNumber })
+                .then(detailedExecution => {
+                    setModal({
+                        ...modal,
+                        execution: detailedExecution,
+                        detailsLoading: false,
+                    })
+                })
+                .catch(e => {
+                    alerts.error(`Failed to load ${jobId} for ${modal.execution.thingsName}: ${e.message}`);
+                    setModal({
+                        ...modal,
+                        detailsLoading: false,
+                    })
+                })
+        }
+
+        if (modal.cancelLoading) {
+            pitsService.jobs()
+                .resource(jobId, 'executions')
+                .resource(modal.execution.thingName, 'cancel')
+                .create({ force: true })
+                .then(() => {
+                    alerts.success(`Successfully canceled ${jobId} for ${thingDisplayName[modal.execution.thingName]}`);
+                    setModal({
+                        ...modal,
+                        cancelShow: false,
+                        cancelLoading: false,
+                    })
+                })
+                .catch(e => {
+                    alerts.error(`Failed to cancel ${jobId} for ${modal.execution.thingName}: ${e.message}`);
+                    setModal({
+                        ...modal,
+                        cancelLoading: false,
+                    })
+                })
+        }
+
+        if (modal.deleteLoading) {
+            pitsService.jobs()
+                .resource(jobId, 'executions')
+                .resource(modal.execution.thingName, 'number')
+                .delete(modal.execution.executionNumber)
+                .then(() => {
+                    alerts.success(`Successfully deleted ${jobId} for ${thingDisplayName[modal.execution.thingName]}`);
+                    setModal({
+                        ...modal,
+                        deleteLoading: false,
+                        deleteShow: false,
+                    })
+                })
+                .catch(e => {
+                    alerts.error(`Failed to delete ${jobId} for ${thingDisplayName[modal.execution.thingName]}: ${e.message}`);
+                    setModal({
+                        ...modal,
+                        deleteLoading: false,
+                    })
+                })
+        }
+    });
+
     const columns = [
         {
             label: 'Camera',
@@ -110,22 +174,167 @@ function JobExecutionTable({ jobId }) {
             label: 'Started At',
             centered: true,
             format: (item) => {
+                if (!item.startedAt) {
+                    return 'NA';
+                }
                 return `${formatDate(item.startedAt)} ${formatTime(item.startedAt)}`;
             }
         }
     ];
+
+    const isCancelable = execution => {
+        return ['QUEUED', 'IN_PROGRESS'].indexOf(execution.status) !== -1;
+    }
+
+    const cancelJobExecution = () => {
+        setModal({
+            ...modal,
+            cancelLoading: true,
+        })
+    };
+
+    const deleteJobExecution = () => {
+        setModal({
+            ...modal,
+            deleteLoading: true,
+        })
+    }
+
+    const actions = [
+        {
+            icon: 'eye',
+            variant: 'outline-secondary',
+            onClick: execution => {
+                return () => {
+                    setModal({
+                        ...modal,
+                        execution,
+                        detailsShow: true,
+                        detailsLoading: true,
+                    })
+                }
+            }
+        },
+        {
+            icon: 'stop-circle',
+            variant: 'outline-danger',
+            filter: isCancelable,
+            onClick: execution => {
+                return () => {
+                    setModal({
+                        ...modal,
+                        execution,
+                        cancelShow: true,
+                    })
+                }
+            }
+        },
+        {
+            icon: 'trash',
+            variant: 'danger',
+            onClick: execution => {
+                return () => {
+                    setModal({
+                        ...modal,
+                        execution,
+                        deleteShow: true,
+                    })
+                }
+            }
+        }
+    ];
+
     return (
-        <ResourceList
-            resource={resource}
-            resourceTitle="Execution"
-            resourceId="thingName"
-            hideSearchText={true}
-            create={false}
-            createTimeField='queuedAt'
-            formatTimestamp={createTime => `${formatDate(createTime)} ${formatTime(createTime)}`}
-            disableMutate={true}
-            columns={columns}
-        />
+        <>
+            <Modal size="lg" show={modal.deleteShow} onHide={() => setModal({...modal, deleteShow: false})}>
+                <Modal.Header closeButton>
+                    <Modal.Title>
+                        Delete {thingDisplayName[modal.execution.thingName]} execution number {modal.execution.executionNumber}
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>
+                        Are you sure you want to delete job <strong>execution number {modal.execution.executionNumber}</strong> for <strong>{thingDisplayName[modal.execution.thingName]}</strong>?
+                    </p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button onClick={() => setModal({...modal, deleteShow: false})} variant="outline-secondary">Close</Button>
+                    <Button disabled={modal.deleteLoading} onClick={deleteJobExecution} variant="danger">Delete</Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal size="lg" show={modal.cancelShow} onHide={() => setModal({...modal, cancelShow: false})}>
+                <Modal.Header closeButton>
+                    <Modal.Title>
+                        Cancel execution {modal.execution.executionNumber} for {thingDisplayName[modal.execution.thingName]}
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>
+                        Are you sure you want to cancel job <strong>execution number {modal.execution.executionNumber}</strong> for <strong>{thingDisplayName[modal.execution.thingName]}</strong>?
+                    </p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="outline-secondary" onClick={() => setModal({...modal, cancelShow: false})}>Close</Button>
+                    <Button disabled={modal.cancelLoading} onClick={cancelJobExecution} variant="danger">Cancel</Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal size="lg" show={modal.detailsShow} onHide={() => setModal({...modal, detailsShow: false})}>
+                <Modal.Header closeButton>
+                    <Modal.Title>
+                        Details for {thingDisplayName[modal.execution.thingName]} execution {modal.execution.executionNumber}
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Row>
+                        <Col><strong>Status</strong></Col>
+                        <Col><Badge bg={getStatusColor(modal.execution.status)}>{modal.execution.status}</Badge></Col>
+                    </Row>
+                    <Row className="mt-2">
+                        {modal.detailsLoading && <Col className="text-center"><Spinner size="lg" animation="border"/></Col>}
+                        {!modal.detailsLoading && modal.execution?.statusDetails?.detailsMap &&
+                            <Table className="ms-1" borderless responsive>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Reason</strong></td>
+                                        <td>{modal.execution.statusDetails.detailsMap.reason}</td>
+                                    </tr>
+                                    <tr colSpan={2}>
+                                        <td><strong>Stdout</strong> <code>&gt;</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td colSpan={2}>
+                                            <pre
+                                                className="ps-2 pt-2 pb-2"
+                                                style={{ border: '1px solid #ddd', backgroundColor: 'black', color: 'white'}}>{modal.execution.statusDetails.detailsMap.stdout}</pre>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </Table>
+                        }
+                    </Row>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="outline-secondary" onClick={() => setModal({...modal, detailsShow: false})}>Close</Button>
+                </Modal.Footer>
+            </Modal>
+
+            {!modal.cancelLoading && !modal.deleteLoading &&
+                <ResourceList
+                    resource={resource}
+                    resourceTitle="Execution"
+                    resourceId="thingName"
+                    hideSearchText={true}
+                    create={false}
+                    createTimeField='queuedAt'
+                    formatTimestamp={createTime => `${formatDate(createTime)} ${formatTime(createTime)}`}
+                    disableMutate={true}
+                    columns={columns}
+                    actions={actions}
+                />
+            }
+        </>
     )
 }
 
@@ -160,6 +369,12 @@ function JobMutate() {
         targetId: ''
     });
 
+    const [ cancelModal, setCancelModal ] = useState({
+        show: false,
+        jobLoading: false,
+        job: {}
+    })
+
     const [ content, setContent ] = useState({
         id: jobId,
         loading: !create
@@ -169,7 +384,8 @@ function JobMutate() {
         type: 'update',
         description: '',
         cameras: [],
-        groups: []
+        groups: [],
+        parameters: {'user': 'root'},
     });
 
     useEffect(() => {
@@ -225,6 +441,12 @@ function JobMutate() {
                 })
                 .catch(e => {
                     alerts.error(`Failed to ${create ? 'create' : 'update'} job: ${e}`)
+                })
+                .finally(() => {
+                    setData({
+                        ...data,
+                        submitting: false,
+                    })
                 });
         }
     };
@@ -270,6 +492,20 @@ function JobMutate() {
 
     return (
         <>
+            <JobCancelationModal
+                show={cancelModal.show}
+                onHide={() => setCancelModal({...cancelModal, show: false})}
+                job={formData}
+                jobLoading={false}
+                onCancel={({starting}) => {
+                    if (!starting) {
+                        setContent({
+                            ...content,
+                            loading: true
+                        })
+                    }
+                }}
+            />
             <AccountBreadcrumb/>
             <Modal size="lg" show={modal.visible} onHide={toggleModal(false)}>
                 <Modal.Header closeButton>
@@ -359,10 +595,28 @@ function JobMutate() {
                             </Form.Group>
                         </>
                     }
-                    <Form.Group className="mb-3" controlId="type">
-                        <Form.Label>Type</Form.Label>
-                        <JobTypeSelect disabled={disabled || !create} name="type" required onChange={inputChange} value={formData.type}/>
-                    </Form.Group>
+                    <ProvideResource resource={pitsService.jobTypes()}>
+                        <JobTypeSelect
+                            disabled={disabled || !create}
+                            name="type"
+                            required
+                            onChange={inputChange}
+                            value={formData.type}
+                            parameters={formData.parameters}
+                            onParameterChange={(param, value) => {
+                                let parameters = formData.parameters;
+                                if (value === '') {
+                                    delete parameters[param];
+                                } else {
+                                    parameters[param] = value;
+                                }
+                                setFormData({
+                                    ...formData,
+                                    parameters,
+                                })
+                            }}
+                        />
+                    </ProvideResource>
                     <Form.Group className="mb-3" controlId="description">
                         <Form.Label>Description</Form.Label>
                         <Form.Control
@@ -373,7 +627,10 @@ function JobMutate() {
                             as='textarea'
                         />
                     </Form.Group>
-                    <CancelButton className="me-1" disabled={data.submitting}/>
+                    <CancelButton cancelTo="/account/jobs" className="me-1" disabled={data.submitting}/>
+                    {formData.status === 'IN_PROGRESS' &&
+                        <Button onClick={() => setCancelModal({...cancelModal, show: true})} variant="danger" className="me-1">{icons.icon('stop-circle')} Cancel</Button>
+                    }
                     <Button disabled={data.submitting} type="submit" variant="success">{create ? 'Create' : 'Update'}</Button>
                 </Form>
                 {!create && <hr/>}

@@ -5,7 +5,11 @@ function CancelButton(props) {
     const navigate = useNavigate();
 
     const cancelAndReturn = () => {
-        navigate(-1);
+        if (props.cancelTo) {
+            navigate(props.cancelTo);
+        } else {
+            navigate(-1);
+        }
     };
 
     return (
