@@ -35,7 +35,7 @@ function useProviderAlerts() {
 
     const error = message => {
         notify({
-            icon: 'exclaimation-circle',
+            icon: 'exclamation-circle',
             variant: 'danger',
             message
         });

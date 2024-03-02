@@ -210,7 +210,9 @@ export function ResourceTable(props) {
                                 {isActions &&
                                 <td>
                                     {!(props.disableMutate || props.disableEdit) && <Button size="sm" className="me-1" as={Link} to={editLink} variant="secondary">{icons.icon('pencil')}</Button>}
-                                    {(props.actions || []).map(action => <Button size="sm" className="me-1" variant="secondary" onClick={action.onClick(item, resource.reload)} key={`item-${index}-${action.icon}`}>{icons.icon(action.icon)}</Button>)}
+                                    {(props.actions || [])
+                                        .filter(action => typeof action.filter === 'undefined' || action.filter(item))
+                                        .map(action => <Button size="sm" className="me-1" variant={action.variant || "secondary"} onClick={action.onClick(item, resource.reload)} key={`item-${index}-${action.icon}`}>{icons.icon(action.icon)}</Button>)}
                                     {!(props.disableMutate || props.disableDelete) && <Button size="sm" onClick={handleDeleteModal(item)} variant="danger">{icons.icon('trash')}</Button>}
                                 </td>
                                 }

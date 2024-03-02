@@ -45,10 +45,10 @@ function CameraCard(props) {
         pitsService.startVideoCapture(props.thingName)
             .then(resp => resp.json())
             .then(capture => {
-                alerts.success(`Successfully sent event to capture video for ${props.displayName}`);
+                alerts.success(`Successfully sent event to capture video for ${props.displayName || props.thingName}`);
             })
             .catch(e => {
-                alerts.error(`Failed to send event to capture video for ${props.displayName}: ${e.message}`);
+                alerts.error(`Failed to send event to capture video for ${props.displayName || props.thingName}: ${e.message}`);
             })
             .finally(() => {
                 setImage({
