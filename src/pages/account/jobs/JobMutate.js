@@ -385,7 +385,11 @@ function JobMutate() {
         description: '',
         cameras: [],
         groups: [],
-        parameters: {'user': 'root'},
+        parameters: {
+            'user': 'root',
+            'service': 'pinthesky',
+            'lines': 20,
+        },
     });
 
     useEffect(() => {
