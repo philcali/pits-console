@@ -77,7 +77,7 @@ function Jobs() {
         },
         {
             label: 'Type',
-            format: item => item.type.charAt(0).toString().toUpperCase() + item.type.substring(1)
+            format: item => (item.type.charAt(0).toString().toUpperCase() + item.type.substring(1)).replace('-', ' ')
         },
         {
             label: 'Status',
