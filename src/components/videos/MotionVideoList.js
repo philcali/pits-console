@@ -7,6 +7,7 @@ import MotionVideo from "../cameras/MotionVideo";
 import { icons } from "../common/Icons";
 import ResourceList from "../resource/ResourceList";
 import TagControl from "./TagControl";
+import logo from "../../logo2.png";
 
 function SearchResource(props) {
     let [ resource, setResource ] = useState({
@@ -95,6 +96,16 @@ function MotionVideoList(props) {
     });
 
     const columns = [
+        {
+            label: 'Thumbnail',
+            format: item => {
+                let image = logo;
+                if (item.thumbnail) {
+                    image = `data:image/jpeg;base64, ${item.thumbnail}`;
+                }
+                return <img width={120} src={image} alt="Motion Thumbnail" />
+            }
+        },
         {
             label: 'Camera',
             format: (item) => {
