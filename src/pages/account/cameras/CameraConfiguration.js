@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Col, Container, Form, Row } from "react-bootstrap";
+import { Accordion, Button, Col, Container, Form, Row } from "react-bootstrap";
 import { Link, useParams } from "react-router-dom";
 import CameraCard from "../../../components/cameras/CameraCard";
 import AccountBreadcrumb from "../../../components/common/AccountBreadcrumb";
@@ -17,6 +17,14 @@ const LEVELS = [
     '4', '4.1', '4.2'
 ];
 
+const LOG_LEVELS = [
+    'DEBUG',
+    'INFO',
+    'WARNING',
+    'ERROR',
+    'FATAL',
+];
+
 function CameraConfiguration() {
     const alerts = useAlerts();
     const { cameraId } = useParams();
@@ -24,16 +32,30 @@ function CameraConfiguration() {
         loading: true
     });
     const [ formData, setFormData ] = useState({
-        buffer: '',
-        sensitivity: '',
-        rotation: '',
-        resolution_height: '',
-        resolution_width: '',
-        recording_window: '',
-        encoding_bitrate: '',
-        encoding_level: '',
-        encoding_profile: '',
-        framerate: '',
+        camera: {
+            buffer: '',
+            sensitivity: '',
+            rotation: '',
+            resolution_height: '',
+            resolution_width: '',
+            recording_window: '',
+            encoding_bitrate: '',
+            encoding_level: '',
+            encoding_profile: '',
+            framerate: '',
+        },
+        cloudwatch: {
+            log_level: 'INFO',
+            enabled: false,
+            threaded: false,
+            delineate_stream: true,
+            log_group_name: '/pits/device/DaemonLogging',
+            metric_namespace: 'Pits/Device',
+            event_type: 'logs',
+        },
+        health: {
+            interval: 3600,
+        },
         loading: true
     });
     const [ data, setData ] = useState({
@@ -44,17 +66,30 @@ function CameraConfiguration() {
     useEffect(() => {
         let isMounted = true;
         if (formData.loading) {
-            pitsService.cameras().resource(cameraId, 'configuration').list()
+            let documents = [
+                'camera',
+                'cloudwatch',
+                'health',
+            ]
+            pitsService.cameras().resource(cameraId, 'configuration').list({'document': documents})
                 .then(configuration => {
                     if (isMounted) {
-                        let [ resolution_width, resolution_height ] = configuration.resolution.split('x');
-                        let [ recording_start, recording_end ] = configuration.recording_window.split('-');
+                        let [ resolution_width, resolution_height ] = configuration.camera.resolution.split('x');
+                        let [ recording_start, recording_end ] = configuration.camera.recording_window.split('-');
                         setFormData({
-                            ...configuration,
-                            resolution_width,
-                            resolution_height,
-                            recording_start,
-                            recording_end,
+                            camera: {
+                                ...configuration.camera,
+                                resolution_width,
+                                resolution_height,
+                                recording_start,
+                                recording_end,
+                            },
+                            cloudwatch: {
+                                ...(configuration.cloudwatch || formData.cloudwatch),
+                            },
+                            health: {
+                                ...(configuration.health || formData.health),
+                            },
                             loading: false
                         });
                     }
@@ -106,14 +141,28 @@ function CameraConfiguration() {
                 submitting: true
             });
             let payload = {
-                recording_window: [formData.recording_start, formData.recording_end].join('-'),
-                resolution: [formData.resolution_width, formData.resolution_height].join('x')
+                camera: {
+                    recording_window: [
+                        formData.camera.recording_start,
+                        formData.camera.recording_end
+                    ].join('-'),
+                    resolution: [
+                        formData.camera.resolution_width,
+                        formData.camera.resolution_height
+                    ].join('x')
+                },
+                cloudwatch: {
+                    ...formData.cloudwatch,
+                },
+                health: {
+                    ...formData.health,
+                }
             };
-            for (let key in formData) {
+            for (let key in formData.camera) {
                 if (key === 'loading' || key.match(/^recording_/) || key.match(/^resolution/)) {
                     continue;
                 }
-                payload[key] = formData[key];
+                payload.camera[key] = formData.camera[key];
             }
             pitsService.cameras().resource(cameraId, 'configuration').create(payload)
                 .then(result => {
@@ -131,10 +180,13 @@ function CameraConfiguration() {
         }
     };
 
-    const inputChange = event => {
+    const inputChange = parent => event => {
         setFormData({
             ...formData,
-            [event.currentTarget.name]: event.currentTarget.value
+            [parent]: {
+                ...formData[parent],
+                [event.currentTarget.name]: event.currentTarget.value,
+            }
         });
     };
 
@@ -151,75 +203,260 @@ function CameraConfiguration() {
                             <CameraCard displayName={cameraData.displayName} thingName={cameraId}/>
                         </Col>
                         <Col>
-                            <Row className="mb-3">
-                                <Form.Group as={Col}>
-                                    <Form.Label>Buffer</Form.Label>
-                                    <Form.Control onChange={inputChange} type="number" disabled={formData.loading} value={formData.buffer} required name="buffer"/>
-                                </Form.Group>
-                                <Form.Group as={Col}>
-                                    <Form.Label>Sensitivity</Form.Label>
-                                    <Form.Control onChange={inputChange} type="number" disabled={formData.loading} value={formData.sensitivity} name="sensitivity"/>
-                                </Form.Group>
-                            </Row>
-                            <Row className="mb-3">
-                                <Form.Group as={Col}>
-                                    <Form.Label>Rotation</Form.Label>
-                                    <Form.Select disabled={formData.loading} onChange={inputChange} name="rotation" value={formData.rotation}>
-                                        {[0, 90, 180, 270].map((degree, index) => <option key={`degree-${index}`} value={degree}>{degree}</option>)}
-                                    </Form.Select>
-                                </Form.Group>
-                                <Form.Group as={Col}>
-                                    <Form.Label>Framerate</Form.Label>
-                                    <Form.Control onChange={inputChange} type="number" disabled={formData.loading} value={formData.framerate} required name="framerate"/>
-                                </Form.Group>
-                            </Row>
-                            <Row className="mb-3">
-                                <Form.Group as={Col}>
-                                    <Form.Label>Resolution Width</Form.Label>
-                                    <Form.Control onChange={inputChange} type="number" disabled={formData.loading} value={formData.resolution_width} name="resolution_width"/>
-                                </Form.Group>
-                                <Form.Group as={Col}>
-                                    <Form.Label>Resolution Height</Form.Label>
-                                    <Form.Control onChange={inputChange} type="number" disabled={formData.loading} value={formData.resolution_height} name="resolution_height"/>
-                                </Form.Group>
-                            </Row>
-                            <Row className="mb-3">
-                                <Form.Group as={Col} controlId="recording_start">
-                                    <Form.Label>Recording Window Start</Form.Label>
-                                    <Form.Select disabled={formData.loading} onChange={inputChange} name="recording_start" value={formData.recording_start}>
-                                        {Array(24).fill().map((num, index) => <option key={`start-${index}`} value={index}>{index}</option>)}
-                                    </Form.Select>
-                                </Form.Group>
-                                <Form.Group as={Col}>
-                                    <Form.Label>Recording Window End</Form.Label>
-                                    <Form.Select disabled={formData.loading} onChange={inputChange} name="recording_end" value={formData.recording_end}>
-                                        {Array(24).fill().map((num, index) => <option key={`end-${index}`} value={index}>{index}</option>)}
-                                    </Form.Select>
-                                </Form.Group>
-                            </Row>
-                            <Row className="mb-3">
-                                <Form.Group as={Col}>
-                                    <Form.Label>Encoding Profile</Form.Label>
-                                    <Form.Select onChange={inputChange} name="encoding_profile" disabled={formData.loading} value={formData.encoding_profile}>
-                                        {['baseline', 'main', 'extended', 'high', 'constrained'].map(profile => {
-                                            return <option key={`encoding-${profile}`} value={profile}>{profile}</option>
-                                        })}
-                                    </Form.Select>
-                                </Form.Group>
-                                <Form.Group as={Col}>
-                                    <Form.Label>Encoding Level</Form.Label>
-                                    <Form.Select onChange={inputChange} disabled={formData.loading} value={formData.encoding_level} name="encoding_level">
-                                        {LEVELS.map((level, index) => <option key={`level-${index}`} value={level}>{level}</option>)}
-                                    </Form.Select>
-                                </Form.Group>
-                            </Row>
-                            <Row className="mb-3">
-                                <Form.Group as={Col}>
-                                    <Form.Label>Encoding Bitrate</Form.Label>
-                                    <Form.Control onChange={inputChange} type="number" step={1000} disabled={formData.loading} value={formData.encoding_bitrate} required name="encoding_bitrate"/>
-                                </Form.Group>
-                            </Row>
-                            <Row>
+                            <Accordion defaultActiveKey="camera">
+                                <Accordion.Item eventKey="camera">
+                                    <Accordion.Header><strong>Camera Configuration</strong></Accordion.Header>
+                                    <Accordion.Body>
+                                        <Row>
+                                            <Form.Group as={Col}>
+                                                <Form.Label>Buffer</Form.Label>
+                                                <Form.Control
+                                                    onChange={inputChange('camera')}
+                                                    type="number"
+                                                    disabled={formData.loading}
+                                                    value={formData.camera.buffer}
+                                                    required name="buffer"/>
+                                            </Form.Group>
+                                            <Form.Group as={Col}>
+                                                <Form.Label>Sensitivity</Form.Label>
+                                                <Form.Control
+                                                    onChange={inputChange('camera')}
+                                                    type="number"
+                                                    disabled={formData.loading}
+                                                    value={formData.camera.sensitivity}
+                                                    name="sensitivity"/>
+                                            </Form.Group>
+                                        </Row>
+                                        <Row className="mt-3">
+                                            <Form.Group as={Col}>
+                                                <Form.Label>Rotation</Form.Label>
+                                                <Form.Select
+                                                    disabled={formData.loading}
+                                                    onChange={inputChange('camera')}
+                                                    name="rotation"
+                                                    value={formData.camera.rotation}>
+                                                    {[0, 90, 180, 270].map((degree, index) => <option key={`degree-${index}`} value={degree}>{degree}</option>)}
+                                                </Form.Select>
+                                            </Form.Group>
+                                            <Form.Group as={Col}>
+                                                <Form.Label>Framerate</Form.Label>
+                                                <Form.Control
+                                                    onChange={inputChange('camera')}
+                                                    type="number"
+                                                    disabled={formData.loading}
+                                                    value={formData.camera.framerate}
+                                                    required name="framerate"/>
+                                            </Form.Group>
+                                        </Row>
+                                        <Row className="mt-3">
+                                            <Form.Group as={Col}>
+                                                <Form.Label>Resolution Width</Form.Label>
+                                                <Form.Control
+                                                    onChange={inputChange('camera')}
+                                                    type="number"
+                                                    disabled={formData.loading}
+                                                    value={formData.camera.resolution_width}
+                                                    name="resolution_width"/>
+                                            </Form.Group>
+                                            <Form.Group as={Col}>
+                                                <Form.Label>Resolution Height</Form.Label>
+                                                <Form.Control
+                                                    onChange={inputChange('camera')}
+                                                    type="number"
+                                                    disabled={formData.loading}
+                                                    value={formData.camera.resolution_height}
+                                                    name="resolution_height"/>
+                                            </Form.Group>
+                                        </Row>
+                                        <Row className="mt-3">
+                                            <Form.Group as={Col} controlId="recording_start">
+                                                <Form.Label>Recording Window Start</Form.Label>
+                                                <Form.Select
+                                                    disabled={formData.loading}
+                                                    onChange={inputChange('camera')}
+                                                    name="recording_start"
+                                                    value={formData.camera.recording_start}>
+                                                    {Array(24).fill().map((num, index) => <option key={`start-${index}`} value={index}>{index}</option>)}
+                                                </Form.Select>
+                                            </Form.Group>
+                                            <Form.Group as={Col}>
+                                                <Form.Label>Recording Window End</Form.Label>
+                                                <Form.Select
+                                                    disabled={formData.loading}
+                                                    onChange={inputChange('camera')}
+                                                    name="recording_end"
+                                                    value={formData.camera.recording_end}>
+                                                    {Array(24).fill().map((num, index) => <option key={`end-${index}`} value={index}>{index}</option>)}
+                                                </Form.Select>
+                                            </Form.Group>
+                                        </Row>
+                                        <Row className="mt-3">
+                                            <Form.Group as={Col}>
+                                                <Form.Label>Encoding Profile</Form.Label>
+                                                <Form.Select
+                                                    onChange={inputChange('camera')}
+                                                    name="encoding_profile"
+                                                    disabled={formData.loading}
+                                                    value={formData.camera.encoding_profile}>
+                                                    {['baseline', 'main', 'extended', 'high', 'constrained'].map(profile => {
+                                                        return <option key={`encoding-${profile}`} value={profile}>{profile}</option>
+                                                    })}
+                                                </Form.Select>
+                                            </Form.Group>
+                                            <Form.Group as={Col}>
+                                                <Form.Label>Encoding Level</Form.Label>
+                                                <Form.Select
+                                                    onChange={inputChange('camera')}
+                                                    disabled={formData.loading}
+                                                    value={formData.camera.encoding_level}
+                                                    name="encoding_level">
+                                                    {LEVELS.map((level, index) => <option key={`level-${index}`} value={level}>{level}</option>)}
+                                                </Form.Select>
+                                            </Form.Group>
+                                        </Row>
+                                        <Row className="mt-3">
+                                            <Form.Group as={Col}>
+                                                <Form.Label>Encoding Bitrate</Form.Label>
+                                                <Form.Control
+                                                    onChange={inputChange('camera')}
+                                                    type="number"
+                                                    step={1000}
+                                                    disabled={formData.loading}
+                                                    value={formData.camera.encoding_bitrate}
+                                                    required name="encoding_bitrate"/>
+                                            </Form.Group>
+                                        </Row>
+                                    </Accordion.Body>
+                                </Accordion.Item>
+                                <Accordion.Item eventKey="cloudwatch">
+                                    <Accordion.Header><strong>Logging Configuration</strong></Accordion.Header>
+                                    <Accordion.Body>
+                                        <Row>
+                                            <Form.Group as={Col}>
+                                                <Form.Label>Log Level</Form.Label>
+                                                <Form.Select
+                                                    disabled={formData.loading}
+                                                    onChange={inputChange('cloudwatch')}
+                                                    value={formData.cloudwatch.log_level}
+                                                    name="log_level"
+                                                >
+                                                    {LOG_LEVELS.map(level => <option key={`log-level-${level}`} value={level}>{level}</option>)}
+                                                </Form.Select>
+                                            </Form.Group>
+                                            <Form.Group as={Col}>
+                                                <Form.Label>Upload to CloudWatch</Form.Label>
+                                                <Form.Switch
+                                                    disabled={formData.loading}
+                                                    checked={formData.cloudwatch.enabled}
+                                                    onChange={e => setFormData({
+                                                        ...formData,
+                                                        cloudwatch: {
+                                                            ...formData.cloudwatch,
+                                                            enabled: e.target.checked,
+                                                        }
+                                                    })}
+                                                    id='cloudwatch-enabled'
+                                                    label="Enabled"
+                                                />
+                                            </Form.Group>
+                                        </Row>
+                                        {formData.cloudwatch.enabled &&
+                                            <>
+                                                <Row className="mt-3">
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>Background Thread</Form.Label>
+                                                        <Form.Switch
+                                                            id="cloudwatch-threaded"
+                                                            disabled={formData.loading}
+                                                            label="Enabled"
+                                                            checked={formData.cloudwatch.threaded}
+                                                            onChange={e => setFormData({
+                                                                ...formData,
+                                                                cloudwatch: {
+                                                                    ...formData.cloudwatch,
+                                                                    threaded: e.target.checked,
+                                                                }
+                                                            })}
+                                                        />
+                                                    </Form.Group>
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>Delineate Stream</Form.Label>
+                                                        <Form.Switch
+                                                            id="cloudwatch-delineate_stream"
+                                                            disabled={formData.loading}
+                                                            label="Enabled"
+                                                            checked={formData.cloudwatch.delineate_stream}
+                                                            onChange={e => setFormData({
+                                                                ...formData,
+                                                                cloudwatch: {
+                                                                    ...formData.cloudwatch,
+                                                                    delineate_stream: e.target.checked,
+                                                                }
+                                                            })}
+                                                        />
+                                                    </Form.Group>
+                                                </Row>
+                                                <Row className="mt-3">
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>Log Group</Form.Label>
+                                                        <Form.Control
+                                                            disabled={formData.loading}
+                                                            onChange={inputChange('cloudwatch')}
+                                                            value={formData.cloudwatch.log_group_name}
+                                                            name="log_group_name"
+                                                        />
+                                                    </Form.Group>
+                                                </Row>
+                                                <Row className="mt-3">
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>Event Type</Form.Label>
+                                                        <Form.Select
+                                                            disabled={formData.loading}
+                                                            onChange={inputChange('cloudwatch')}
+                                                            value={formData.cloudwatch.event_type}
+                                                            name="event_type"
+                                                        >
+                                                            <option value="logs">Logs</option>
+                                                            <option value="emf">EMF</option>
+                                                            <option value="all">All</option>
+                                                        </Form.Select>
+                                                    </Form.Group>
+                                                    {formData.cloudwatch.event_type !== 'logs' &&
+                                                        <Form.Group as={Col}>
+                                                            <Form.Label>Namespace</Form.Label>
+                                                            <Form.Control
+                                                                disabled={formData.loading}
+                                                                name="metric_namespace"
+                                                                onChange={inputChange('metric_namespace')}
+                                                                value={formData.cloudwatch.metric_namespace}
+                                                            />
+                                                        </Form.Group>
+                                                    }
+                                                </Row>
+                                            </>
+                                        }
+                                    </Accordion.Body>
+                                </Accordion.Item>
+                                <Accordion.Item eventKey="health">
+                                    <Accordion.Header><strong>Health Configuration</strong></Accordion.Header>
+                                    <Accordion.Body>
+                                        <Row>
+                                            <Form.Group as={Col}>
+                                                <Form.Label>Interval (in seconds)</Form.Label>
+                                                <Form.Control
+                                                    disabled={formData.loading}
+                                                    name="interval"
+                                                    type="number"
+                                                    step="60"
+                                                    onChange={inputChange('health')}
+                                                    value={formData.health.interval}
+                                                />
+                                            </Form.Group>
+                                        </Row>
+                                    </Accordion.Body>
+                                </Accordion.Item>
+                            </Accordion>
+                            <Row className="mt-2">
                                 <Col className="text-center">
                                     <CancelButton className="me-2" disabled={data.submitting}/>
                                     <Button className="me-2" as={Link} to={`/account/cameras/${cameraId}`} variant="outline-secondary">{icons.icon('pencil')} Edit</Button>
