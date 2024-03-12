@@ -44,6 +44,12 @@ function CameraConfiguration() {
             encoding_profile: '',
             framerate: '',
         },
+        storage: {
+            enabled: true,
+            bucket_name: '',
+            video_prefix: 'motion_videos',
+            image_prefix: 'capture_images',
+        },
         cloudwatch: {
             log_level: 'INFO',
             enabled: false,
@@ -56,7 +62,8 @@ function CameraConfiguration() {
         health: {
             interval: 3600,
         },
-        loading: true
+        loading: false,
+        storageLoading: true,
     });
     const [ data, setData ] = useState({
         validated: false,
@@ -65,9 +72,29 @@ function CameraConfiguration() {
 
     useEffect(() => {
         let isMounted = true;
+        if (formData.storageLoading) {
+            pitsService.storage().get('info')
+                .then(storage => {
+                    setFormData({
+                        ...formData,
+                        storage:{
+                            ...formData.storage,
+                            'bucket_name': storage.bucketName,
+                            'video_prefix': storage.deviceVideoPrefix,
+                            'image_prefix': storage.imagePrefix,
+                        },
+                        loading: true,
+                        storageLoading: false,
+                    })
+                })
+                .catch(e => {
+                    alerts.error(`Failed to retrieve site storage settings: ${e.message}`);
+                })
+        }
         if (formData.loading) {
             let documents = [
                 'camera',
+                'storage',
                 'cloudwatch',
                 'health',
             ]
@@ -84,13 +111,17 @@ function CameraConfiguration() {
                                 recording_start,
                                 recording_end,
                             },
+                            storage: {
+                                ...(configuration.storage || formData.storage),
+                            },
                             cloudwatch: {
                                 ...(configuration.cloudwatch || formData.cloudwatch),
                             },
                             health: {
                                 ...(configuration.health || formData.health),
                             },
-                            loading: false
+                            loading: false,
+                            storageLoading: false,
                         });
                     }
                 })
@@ -326,6 +357,66 @@ function CameraConfiguration() {
                                                     required name="encoding_bitrate"/>
                                             </Form.Group>
                                         </Row>
+                                    </Accordion.Body>
+                                </Accordion.Item>
+                                <Accordion.Item eventKey="storage">
+                                    <Accordion.Header><strong>Storage Configuration</strong></Accordion.Header>
+                                    <Accordion.Body>
+                                        <Row>
+                                            <Form.Group as={Col}>
+                                                <Form.Label>S3 Storage</Form.Label>
+                                                <Form.Switch
+                                                    id="s3-enabled"
+                                                    label="Enabled"
+                                                    disabled={formData.loading}
+                                                    checked={formData.storage.enabled}
+                                                    onChange={e => setFormData({
+                                                        ...formData,
+                                                        storage: {
+                                                            ...formData.storage,
+                                                            enabled: e.target.checked
+                                                        }
+                                                    })}
+                                                />
+                                            </Form.Group>
+                                        </Row>
+                                        {formData.storage.enabled &&
+                                            <>
+                                                <Row className="mt-3">
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>Bucket Name</Form.Label>
+                                                        <Form.Control
+                                                            disabled={formData.loading}
+                                                            name="bucket_name"
+                                                            value={formData.storage.bucket_name}
+                                                            onChange={inputChange('storage')}
+                                                        />
+                                                    </Form.Group>
+                                                </Row>
+                                                <Row className="mt-3">
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>Video Prefix</Form.Label>
+                                                        <Form.Control
+                                                            disabled={formData.loading}
+                                                            name="video_prefix"
+                                                            value={formData.storage.video_prefix}
+                                                            onChange={inputChange('storage')}
+                                                        />
+                                                    </Form.Group>
+                                                </Row>
+                                                <Row className="mt-3">
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>Image Prefix</Form.Label>
+                                                        <Form.Control
+                                                            disabled={formData.loading}
+                                                            name="image_prefix"
+                                                            value={formData.storage.image_prefix}
+                                                            onChange={inputChange('storage')}
+                                                        />
+                                                    </Form.Group>
+                                                </Row>
+                                            </>
+                                        }
                                     </Accordion.Body>
                                 </Accordion.Item>
                                 <Accordion.Item eventKey="cloudwatch">
