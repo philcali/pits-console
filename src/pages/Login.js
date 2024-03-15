@@ -2,15 +2,10 @@ import { useEffect } from "react";
 import { Container, Spinner } from "react-bootstrap";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../components/auth/AuthContext";
+import { parseSearchParams } from "../lib/format";
 
 function parseClientTokenResponse(hash) {
-    let elements = hash.replace('#', '').split('&');
-    let response = {};
-    elements.forEach(elem => {
-        let parts = elem.split('=');
-        response[parts[0]] = parts[1];
-    });
-    return response;
+    return parseSearchParams(hash.replace('#', ''));
 }
 
 function Login() {

@@ -97,7 +97,7 @@ function CameraCard(props) {
         <Card bg={variant} text={variant === 'light' ? 'dark' : 'white'}>
             <Card.Header {...cardHeader}>
                 <strong className="ms-6">{props.displayName || props.thingName}</strong>
-                <CameraHealthBadge thingName={props.thingName} />
+                <CameraHealthBadge latestVersion={props.latestVersion} thingName={props.thingName} />
             </Card.Header>
             {!image.loading &&
             <Card.Img className="fluid" variant="top" src={image.url}/>

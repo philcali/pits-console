@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Badge, Button, Col, Container, Form, Modal, Row, Spinner, Table } from "react-bootstrap";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import AccountBreadcrumb from "../../../components/common/AccountBreadcrumb";
 import CancelButton from "../../../components/common/CancelButton";
 import Header from "../../../components/common/Header";
@@ -9,7 +9,7 @@ import { useAlerts } from "../../../components/notifications/AlertContext";
 import ProvideResource from "../../../components/resource/ProvideResource";
 import { useResource } from "../../../components/resource/ResourceContext";
 import ResourceList from "../../../components/resource/ResourceList";
-import { formatDate, formatTime } from "../../../lib/format";
+import { formatDate, formatTime, parseSearchParams } from "../../../lib/format";
 import { pitsService } from "../../../lib/services";
 import { JobCancelationModal } from "./Jobs";
 
@@ -356,6 +356,8 @@ function getStatusColor(status) {
 function JobMutate() {
     const alerts = useAlerts();
     const navigate = useNavigate();
+    const location = useLocation();
+    const queryParams = parseSearchParams(location.search.replace('?', ''));
     const { jobId } = useParams();
     const create = jobId === 'new';
     const [ data, setData ] = useState({
@@ -381,14 +383,15 @@ function JobMutate() {
     });
 
     const [ formData, setFormData ] = useState({
-        type: 'update',
+        type: queryParams['type'] || 'update',
         description: '',
-        cameras: [],
-        groups: [],
+        cameras: queryParams['targetType'] === 'cameras' && queryParams['targetId'] ? [ queryParams['targetId'] ] : [],
+        groups: queryParams['targetType'] === 'groups' && queryParams['targetId'] ? [ queryParams['targetId'] ] : [],
         parameters: {
             'user': 'root',
             'service': 'pinthesky',
             'lines': 20,
+            ...(queryParams || {}),
         },
     });
 

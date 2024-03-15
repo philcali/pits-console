@@ -34,6 +34,8 @@ function AccountBreadcrumb(props) {
             element.text = 'Health Metrics';
         } else if (part === 'jobs') {
             element.text = 'Jobs';
+        } else if (part === 'versions') {
+            element.text = 'Software Versions';
         } else {
             element.text = part;
         }
