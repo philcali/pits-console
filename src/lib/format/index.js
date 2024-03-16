@@ -15,6 +15,16 @@ function formatTime(timestamp) {
     return toDate(timestamp).toLocaleTimeString();
 }
 
+function parseSearchParams(params) {
+    let elements = params.split('&');
+    let response = {};
+    elements.forEach(elem => {
+        let parts = elem.split('=');
+        response[parts[0]] = decodeURIComponent(parts[1]);
+    });
+    return response;
+}
+
 function formatDuration(duration) {
     if (!duration) {
         return 'NA';
@@ -31,5 +41,6 @@ function formatDuration(duration) {
 export {
     formatDate,
     formatTime,
-    formatDuration
+    formatDuration,
+    parseSearchParams,
 }

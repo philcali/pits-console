@@ -218,7 +218,8 @@ class PitsService extends BaseService {
     'jobs',
     'jobTypes',
     'storage',
-    'stats'
+    'stats',
+    'versions',
 ].forEach(resource => {
     PitsService.prototype[resource] = function name() {
         return this.resource(resource);

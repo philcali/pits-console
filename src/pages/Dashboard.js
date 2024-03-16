@@ -5,12 +5,12 @@ import Header from "../components/common/Header";
 import ProvideResource from "../components/resource/ProvideResource";
 import { useResource } from "../components/resource/ResourceContext";
 
-function Groups() {
+function Groups({ latestVersion }) {
     const resource = useResource();
     const isEmpty = resource.items.length === 0;
     return (
         <>
-            {resource.loading && <Spinner className="mt-3" animation="border"/>}
+            {resource.loading && <Container className="mt-3 text-center"><Spinner animation="border"/></Container>}
             {!resource.loading &&
                 <>
                     {isEmpty &&
@@ -26,7 +26,7 @@ function Groups() {
                             <Container className="mt-3" key={`group-${group.name}`}>
                                 <Header>{group.name}</Header>
                                 <ProvideResource resource={resource.api.resource(group.name, "cameras")}>
-                                    <GroupCameras group={group}/>
+                                    <GroupCameras group={group} latestVersion={latestVersion}/>
                                 </ProvideResource>
                             </Container>
                         )
@@ -37,7 +37,7 @@ function Groups() {
     )
 }
 
-function Cameras() {
+function Cameras({ latestVersion }) {
     const resource = useResource();
     resource.items.sort((left, right) => left.thingName.localeCompare(right.thingName));
 
@@ -49,7 +49,7 @@ function Cameras() {
                     {resource.items.map(camera => {
                         return (
                             <Col className="text-center mt-2" key={`camera-${camera.thingName}`}>
-                                <CameraCard thingName={camera.thingName} displayName={camera.displayName}/>
+                                <CameraCard latestVersion={latestVersion} thingName={camera.thingName} displayName={camera.displayName}/>
                             </Col>
                         )
                     })}
@@ -59,7 +59,7 @@ function Cameras() {
     );
 }
 
-function GroupCameras({ group }) {
+function GroupCameras({ group, latestVersion }) {
     const resource = useResource();
     const isEmpty = resource.items.length === 0;
     return (
@@ -79,7 +79,7 @@ function GroupCameras({ group }) {
                     {!isEmpty &&
                         <ProvideResource additionalParams={{ thingName: resource.items.map(item => item.id) }} resource="cameras">
                             <Row xs={1} md={1} lg={3}>
-                                <Cameras/>
+                                <Cameras latestVersion={latestVersion}/>
                             </Row>
                         </ProvideResource>
                     }
@@ -90,11 +90,29 @@ function GroupCameras({ group }) {
 }
 
 
+function LatestSoftwareVersion() {
+    const resource = useResource();
+    let latestVersion = "";
+    if (resource.items.length > 0) {
+        latestVersion = resource.items[0].name;
+    }
+    return (
+        <>
+            {resource.loading && <Container className="mt-3 text-center"><Spinner animation="border"/></Container>}
+            {!resource.loading &&
+                <ProvideResource resource="groups">
+                    <Groups latestVersion={latestVersion}/>
+                </ProvideResource>
+            }
+        </>
+    )
+}
+
 
 function Dashboard() {
     return (
-        <ProvideResource resource="groups">
-            <Groups/>
+        <ProvideResource resource="versions" itemId="latest">
+            <LatestSoftwareVersion/>
         </ProvideResource>
     );
 }

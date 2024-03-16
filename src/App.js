@@ -26,6 +26,7 @@ import Stats from './pages/account/stats/Stats';
 import HealthHistory from './pages/account/stats/HealthHistory';
 import Jobs from './pages/account/jobs/Jobs';
 import JobMutate from './pages/account/jobs/JobMutate';
+import Versions from './pages/account/versions/Versions';
 
 function App() {
   return (
@@ -54,6 +55,7 @@ function App() {
               <Route path="/account/stats/:thingName" element={<PrivateRoute><HealthHistory/></PrivateRoute>}/>
               <Route path="/account/jobs" element={<PrivateRoute><Jobs/></PrivateRoute>}/>
               <Route path="/account/jobs/:jobId" element={<PrivateRoute><JobMutate/></PrivateRoute>}/>
+              <Route path="/account/versions" element={<PrivateRoute><Versions/></PrivateRoute>}/>
               <Route path="/login" element={<Login/>}/>
               <Route path="/logout" element={<Logout/>}/>
             </Routes>
