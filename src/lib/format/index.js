@@ -19,6 +19,9 @@ function parseSearchParams(params) {
     let elements = params.split('&');
     let response = {};
     elements.forEach(elem => {
+        if (elem === '') {
+            return;
+        }
         let parts = elem.split('=');
         response[parts[0]] = decodeURIComponent(parts[1]);
     });

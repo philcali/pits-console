@@ -35,13 +35,16 @@ function JobTypeSelect(props) {
         props.onParameterChange(param, event.target.value);
     };
 
+    const selectProps = {...props};
+    delete selectProps.onParameterChange;
+
     return (
         <>
             <Form.Group className="mb-3" controlId="type">
                 <Form.Label>Type</Form.Label>
                 <Row>
                     <Col>
-                        <Form.Select {...props} disabled={props.disabled || resource.loading}>
+                        <Form.Select { ...selectProps } disabled={props.disabled || resource.loading}>
                             {resource.items.map(item => <option key={`type-${item.name}`} value={item.name}>{item.name}</option>)}
                         </Form.Select>
                     </Col>
@@ -56,7 +59,7 @@ function JobTypeSelect(props) {
             </Form.Group>
             {(jobType?.parameters || []).map(param => {
                 return (
-                    <Form.Group className="mb-3" controlId={`parameters-${param}`}>
+                    <Form.Group key={`form-group-param-${param}`} className="mb-3" controlId={`parameters-${param}`}>
                         <Form.Label>Parameter: <Badge pill>{param}</Badge></Form.Label>
                         <Form.Control disabled={props.disabled} value={props.parameters[param] || ''} onChange={onParameterChange(param)} type="input"></Form.Control>
                     </Form.Group>
@@ -391,7 +394,7 @@ function JobMutate() {
             'user': 'root',
             'service': 'pinthesky',
             'lines': 20,
-            ...(queryParams || {}),
+            ...(queryParams ?? {}),
         },
     });
 
@@ -565,7 +568,6 @@ function JobMutate() {
                                     </thead>
                                     <tbody>
                                         {['Cameras', 'Groups'].flatMap(target => {
-                                            console.log(formData[target.toLowerCase()])
                                             return formData[target.toLowerCase()].map((name, index) => {
                                                 return (
                                                     <tr key={`${target}-${name}`}>
@@ -634,7 +636,7 @@ function JobMutate() {
                             as='textarea'
                         />
                     </Form.Group>
-                    <CancelButton cancelTo="/account/jobs" className="me-1" disabled={data.submitting}/>
+                    <CancelButton cancelto="/account/jobs" className="me-1" disabled={data.submitting}/>
                     {formData.status === 'IN_PROGRESS' &&
                         <Button onClick={() => setCancelModal({...cancelModal, show: true})} variant="danger" className="me-1">{icons.icon('stop-circle')} Cancel</Button>
                     }
