@@ -6,14 +6,8 @@ import { useResource } from "../../../components/resource/ResourceContext";
 import { useAlerts } from "../../../components/notifications/AlertContext";
 import ResourceList from "../../../components/resource/ResourceList";
 import { formatDate, formatTime } from "../../../lib/format";
-import { pitsService } from "../../../lib/services";
+import { useConnection } from "../../../components/connection/ConnectionContext";
 
-const TIMEOUT = 5000;
-const INTERVAL_TIME = 1000;
-
-const unixTimestamp = () => {
-    return Math.floor(Date.now() / 1000);
-};
 
 export const statsColums = (getDisplayName) => {
     return [
@@ -88,6 +82,7 @@ export const statsColums = (getDisplayName) => {
 
 function StatsTable() {
     const resource = useResource();
+    const connection = useConnection();
     const alerts = useAlerts();
     const navigate = useNavigate();
     const displayNameMap = {};
@@ -109,34 +104,15 @@ function StatsTable() {
             icon: 'arrow-clockwise',
             onClick: (item, reload) => {
                 return () => {
-                    pitsService.cameras()
-                        .resource(item.thing_name, 'stats')
-                        .create({})
-                        .then(resp => {
-                            alerts.success(`Forced a health signal to ${displayNameMap[item.thing_name]}.`);
-                            let max = unixTimestamp() + TIMEOUT;
-                            let timeout = setInterval(() => {
-                                let now = unixTimestamp()
-                                if (now - max >= TIMEOUT) {
-                                    alerts.error(`Failed to update health for ${displayNameMap[item.thing_name]} in time.`);
-                                    clearTimeout(timeout);
-                                } else {
-                                    pitsService.stats().list({ thingName: [ item.thing_name ] })
-                                        .then(lsresp => {
-                                            if (lsresp.items[0].createTime > item.createTime) {
-                                                clearInterval(timeout);
-                                                reload();
-                                            }
-                                        })
-                                        .catch(e => {
-                                            clearInterval(timeout);
-                                        });
-                                }
-                            }, INTERVAL_TIME);
-                        })
-                        .catch(e => {
-                            alerts.error(`Failed to post to ${displayNameMap[item.thing_name]}: ${e.message}`);
-                        });
+                    connection.managerInvoke({
+                        camera: item.thing_name,
+                        event: {
+                            name: 'health'
+                        }
+                    }).then(invoke => {
+                        alerts.success(`Successfully received health command: ${invoke.connection.invoke_id}`);
+                        reload();
+                    }).catch(alerts.error);
                 }
             }
         }

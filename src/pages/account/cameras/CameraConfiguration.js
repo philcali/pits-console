@@ -9,6 +9,7 @@ import { icons } from "../../../components/common/Icons";
 import { useAlerts } from "../../../components/notifications/AlertContext";
 import MotionVideoList from "../../../components/videos/MotionVideoList";
 import { pitsService } from "../../../lib/services";
+import { settings } from "../../../lib/constants";
 
 const LEVELS = [
     '1', '1b', '1.1', '1.2', '1.3',
@@ -59,6 +60,12 @@ function CameraConfiguration() {
                 log_group_name: '/pits/device/DaemonLogging',
                 metric_namespace: 'Pits/Device',
                 event_type: 'logs',
+                region_name: settings.region,
+            },
+            dataplane: {
+                enabled: false,
+                endpoint_url: `https://${new URL(settings.dataEndpoint).hostname}`,
+                region_name: settings.region,
             },
             health: {
                 interval: 3600,
@@ -101,6 +108,7 @@ function CameraConfiguration() {
                 'camera',
                 'storage',
                 'cloudwatch',
+                'dataplane',
                 'health',
             ]
             let states = [
@@ -126,6 +134,9 @@ function CameraConfiguration() {
                                 },
                                 cloudwatch: {
                                     ...(configuration[state].cloudwatch || formData.desired.cloudwatch),
+                                },
+                                dataplane: {
+                                    ...(configuration[state].dataplane || formData.desired.dataplane),
                                 },
                                 health: {
                                     ...(configuration[state].health || formData.desired.health),
@@ -203,6 +214,9 @@ function CameraConfiguration() {
                 },
                 cloudwatch: {
                     ...formData.desired.cloudwatch,
+                },
+                dataplane: {
+                    ...formData.desired.dataplane,
                 },
                 health: {
                     ...formData.desired.health,
@@ -614,6 +628,22 @@ function CameraConfiguration() {
                                                 </Row>
                                                 <Row className="mt-3">
                                                     <Form.Group as={Col}>
+                                                        <Form.Label>AWS Region</Form.Label>
+                                                        <InputGroup>
+                                                            <Form.Control
+                                                                disabled={formData.loading}
+                                                                onChange={inputChange('cloudwatch')}
+                                                                value={formData.desired.cloudwatch.region_name}
+                                                                name="region_name"
+                                                            />
+                                                            {formData.reported && formData.reported.cloudwatch &&
+                                                                <InputGroup.Text>{formData.reported.cloudwatch.region_name}</InputGroup.Text>
+                                                            }
+                                                        </InputGroup>
+                                                    </Form.Group>
+                                                </Row>
+                                                <Row className="mt-3">
+                                                    <Form.Group as={Col}>
                                                         <Form.Label>Event Type</Form.Label>
                                                         <InputGroup>
                                                             <Form.Select
@@ -638,7 +668,7 @@ function CameraConfiguration() {
                                                                 <Form.Control
                                                                     disabled={formData.loading}
                                                                     name="metric_namespace"
-                                                                    onChange={inputChange('metric_namespace')}
+                                                                    onChange={inputChange('cloudwatch')}
                                                                     value={formData.desired.cloudwatch.metric_namespace}
                                                                 />
                                                                 {formData.reported && formData.reported.cloudwatch &&
@@ -647,6 +677,68 @@ function CameraConfiguration() {
                                                             </InputGroup>
                                                         </Form.Group>
                                                     }
+                                                </Row>
+                                            </>
+                                        }
+                                    </Accordion.Body>
+                                </Accordion.Item>
+                                <Accordion.Item eventKey="dataplane">
+                                    <Accordion.Header><strong>Data Plane Configuration</strong></Accordion.Header>
+                                    <Accordion.Body>
+                                        <Row>
+                                            <Form.Group as={Col}>
+                                                <Form.Label>Connection</Form.Label>
+                                                <Form.Switch
+                                                    disabled={formData.loading}
+                                                    checked={formData.desired.dataplane.enabled}
+                                                    onChange={e => setFormData({
+                                                        ...formData,
+                                                        desired: {
+                                                            ...formData.desired,
+                                                            dataplane: {
+                                                                ...formData.desired.dataplane,
+                                                                enabled: e.target.checked,
+                                                            }
+                                                        }
+                                                    })}
+                                                    id='dataplane-enabled'
+                                                    label="Enabled"
+                                                />
+                                            </Form.Group>
+                                        </Row>
+                                        {formData.desired.dataplane.enabled &&
+                                            <>
+                                                <Row>
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>Endpoint</Form.Label>
+                                                        <InputGroup>
+                                                            <Form.Control
+                                                                disabled={formData.loading}
+                                                                name="endpoint_url"
+                                                                onChange={inputChange('dataplane')}
+                                                                value={formData.desired.dataplane.endpoint_url}
+                                                            />
+                                                            {formData.reported && formData.reported.dataplane &&
+                                                                <InputGroup.Text>{formData.reported.dataplane.endpoint_url}</InputGroup.Text>
+                                                            }
+                                                        </InputGroup>
+                                                    </Form.Group>
+                                                </Row>
+                                                <Row className="mt-3">
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>AWS Region</Form.Label>
+                                                        <InputGroup>
+                                                            <Form.Control
+                                                                disabled={formData.loading}
+                                                                onChange={inputChange('dataplane')}
+                                                                value={formData.desired.dataplane.region_name}
+                                                                name="region_name"
+                                                            />
+                                                            {formData.reported && formData.reported.dataplane &&
+                                                                <InputGroup.Text>{formData.reported.dataplane.region_name}</InputGroup.Text>
+                                                            }
+                                                        </InputGroup>
+                                                    </Form.Group>
                                                 </Row>
                                             </>
                                         }

@@ -27,6 +27,7 @@ import HealthHistory from './pages/account/stats/HealthHistory';
 import Jobs from './pages/account/jobs/Jobs';
 import JobMutate from './pages/account/jobs/JobMutate';
 import Versions from './pages/account/versions/Versions';
+import ProvideConnection from './components/connection/ProvideConnection';
 
 function App() {
   return (
@@ -36,29 +37,31 @@ function App() {
         <main>
           <AlertNotifications>
             <Alerts/>
-            <Routes>
-              <Route path="/" element={<PrivateRoute><Home/></PrivateRoute>}/>
-              <Route path="/dashboard" element={<PrivateRoute><Dashboard/></PrivateRoute>}/>
-              <Route path="/account" element={<PrivateRoute><ManageAccount/></PrivateRoute>}/>
-              <Route path="/account/cameras" element={<PrivateRoute><Cameras/></PrivateRoute>}/>
-              <Route path="/account/cameras/:cameraId" element={<PrivateRoute><CameraMutate/></PrivateRoute>}/>
-              <Route path="/account/cameras/:cameraId/configuration" element={<PrivateRoute><CameraConfiguration/></PrivateRoute>}/>
-              <Route path="/account/groups" element={<PrivateRoute><Groups/></PrivateRoute>}/>
-              <Route path="/account/groups/:groupId" element={<PrivateRoute><CreateGroup/></PrivateRoute>}/>
-              <Route path="/account/videos" element={<PrivateRoute><Videos/></PrivateRoute>}/>
-              <Route path="/account/videos/:motionVideo/cameras/:cameraId" element={<PrivateRoute><VideoMutate/></PrivateRoute>}/>
-              <Route path="/account/subscriptions" element={<PrivateRoute><Subscriptions/></PrivateRoute>}/>
-              <Route path="/account/subscriptions/:id" element={<PrivateRoute><SubscriptionMutate/></PrivateRoute>}/>
-              <Route path="/account/tags" element={<PrivateRoute><Tags/></PrivateRoute>}/>
-              <Route path="/account/tags/:tagId" element={<PrivateRoute><TagMutate/></PrivateRoute>}/>
-              <Route path="/account/stats" element={<PrivateRoute><Stats/></PrivateRoute>}/>
-              <Route path="/account/stats/:thingName" element={<PrivateRoute><HealthHistory/></PrivateRoute>}/>
-              <Route path="/account/jobs" element={<PrivateRoute><Jobs/></PrivateRoute>}/>
-              <Route path="/account/jobs/:jobId" element={<PrivateRoute><JobMutate/></PrivateRoute>}/>
-              <Route path="/account/versions" element={<PrivateRoute><Versions/></PrivateRoute>}/>
-              <Route path="/login" element={<Login/>}/>
-              <Route path="/logout" element={<Logout/>}/>
-            </Routes>
+            <ProvideConnection>
+              <Routes>
+                <Route path="/" element={<PrivateRoute><Home/></PrivateRoute>}/>
+                <Route path="/dashboard" element={<PrivateRoute><Dashboard/></PrivateRoute>}/>
+                <Route path="/account" element={<PrivateRoute><ManageAccount/></PrivateRoute>}/>
+                <Route path="/account/cameras" element={<PrivateRoute><Cameras/></PrivateRoute>}/>
+                <Route path="/account/cameras/:cameraId" element={<PrivateRoute><CameraMutate/></PrivateRoute>}/>
+                <Route path="/account/cameras/:cameraId/configuration" element={<PrivateRoute><CameraConfiguration/></PrivateRoute>}/>
+                <Route path="/account/groups" element={<PrivateRoute><Groups/></PrivateRoute>}/>
+                <Route path="/account/groups/:groupId" element={<PrivateRoute><CreateGroup/></PrivateRoute>}/>
+                <Route path="/account/videos" element={<PrivateRoute><Videos/></PrivateRoute>}/>
+                <Route path="/account/videos/:motionVideo/cameras/:cameraId" element={<PrivateRoute><VideoMutate/></PrivateRoute>}/>
+                <Route path="/account/subscriptions" element={<PrivateRoute><Subscriptions/></PrivateRoute>}/>
+                <Route path="/account/subscriptions/:id" element={<PrivateRoute><SubscriptionMutate/></PrivateRoute>}/>
+                <Route path="/account/tags" element={<PrivateRoute><Tags/></PrivateRoute>}/>
+                <Route path="/account/tags/:tagId" element={<PrivateRoute><TagMutate/></PrivateRoute>}/>
+                <Route path="/account/stats" element={<PrivateRoute><Stats/></PrivateRoute>}/>
+                <Route path="/account/stats/:thingName" element={<PrivateRoute><HealthHistory/></PrivateRoute>}/>
+                <Route path="/account/jobs" element={<PrivateRoute><Jobs/></PrivateRoute>}/>
+                <Route path="/account/jobs/:jobId" element={<PrivateRoute><JobMutate/></PrivateRoute>}/>
+                <Route path="/account/versions" element={<PrivateRoute><Versions/></PrivateRoute>}/>
+                <Route path="/login" element={<Login/>}/>
+                <Route path="/logout" element={<Logout/>}/>
+              </Routes>
+            </ProvideConnection>
             <Footer/>
           </AlertNotifications>
         </main>
