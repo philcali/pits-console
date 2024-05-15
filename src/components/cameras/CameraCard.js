@@ -68,7 +68,9 @@ function LiveRecording(props) {
             connection.manager.offRequest(onConnect);
             player.stop();
             jsmpeg.prototype.receiveSocketMessage = existingMethod;
-        };
+            };
+    // Disable linting here... the canvas is *meant* to update independent of react
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return <canvas
